@@ -1,0 +1,4 @@
+Templates<
+	Template EqualTest<Data.String Argument> Data.Boolean
+		:Equals<Data.String><:Argument "A">
+>

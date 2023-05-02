@@ -1,0 +1,7 @@
+Templates<
+	Template IfTest<Data.Boolean Argument> Data.String 
+		If :Argument 
+			"A" 
+			"B"
+	>
+>

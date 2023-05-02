@@ -1,0 +1,9 @@
+Templates<
+	Template IfEqualTest<Data.String Argument> Data.String 
+		If :Equals<Data.String><:Argument "A">
+			"1" 
+			If :Equals<Data.String><:Argument "B">
+				"2"
+				"unmapped"
+	>
+>

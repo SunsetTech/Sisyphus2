@@ -1,0 +1,4 @@
+Templates<
+	Template ArrayTest<Data.Array<Data.String> A, Data.Array<Data.String> B> 
+		Templates.Functions.Join<:Join:A",":Join:B>
+>

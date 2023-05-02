@@ -1,0 +1,5 @@
+With File"A.sph"
+Templates <
+	Template B<Data.String Argument> Templates.Functions.Join<::A"Test":Argument"!">
+	Template BB<Templates.A Argument> Templates.Functions.Join ::Argument
+>
