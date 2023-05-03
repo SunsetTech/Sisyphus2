@@ -3,6 +3,10 @@ local type = Tools.Inspect.GetType
 
 local OOP = require"Moonrise.OOP"
 
+---@class Sisyphus2.Compiler.Objects.Map:Sisyphus2.Compiler.Object
+---@operator call:Sisyphus2.Compiler.Objects.Map
+---@field Types string[]
+---@field Entries table<string, Sisyphus2.Compiler.Object>
 local Map = OOP.Declarator.Shortcuts(
 	"Sisyphus2.Compiler.Objects.Map", {
 		require"Sisyphus2.Compiler.Object"
@@ -50,7 +54,7 @@ Map.Copy = function(self)
 end;
 
 Map.Merge = function(Into, From)
-	for Name, Entry in pairs(From.Entries) do
+	for Name in pairs(From.Entries) do
 		if Into.Entries[Name] then
 			Into.Entries[Name] = Into.Entries[Name] + From.Entries[Name]
 		else

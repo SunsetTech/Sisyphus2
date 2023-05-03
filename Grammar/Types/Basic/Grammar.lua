@@ -17,17 +17,46 @@ local Construct = Import.Module.Relative"Objects.Construct"
 return Basic.Type.Set{
 	Modifier = Basic.Type.Set{
 		--Templated parse that takes a Grammar.Modifier and uses the new grammar to match and return a.. Grammar.Modifier.
+		Using = Basic.Type.Definition(
+			Construct.DynamicParse(
+				Construct.Invocation(
+					"Using",
+					Construct.ArgumentList{Variable.Canonical"Types.Basic.Name.Target"},
+					function(NamespaceLocator, Environment)
+						print(NamespaceLocator(), Environment.Grammar)
+						error"?"
+						Grammar.InitialPattern =
+							PEG.Apply(
+								Construct.Centered(Variable.Canonical"Types.Basic.Grammar.Modifier"),
+								function(ModifiedGrammar)
+									ModifiedGrammar.InitialPattern = Grammar.InitialPattern
+									return ModifiedGrammar
+								end
+							)
+						
+						return
+							Grammar/"userdata", {
+								Grammar = Grammar;
+								Variables = {};
+							}
+					end
+				)
+			)
+		);
+
+
 		With = Basic.Type.Definition(
 			Construct.DynamicParse(
 				Construct.Invocation(
 					"With",
 					Construct.ArgumentList{Variable.Canonical"Types.Basic.Grammar.Modifier"},
 					function(Grammar, Environment)
+						local ResumePattern = Grammar.InitialPattern
 						Grammar.InitialPattern =
 							PEG.Apply(
 								Construct.Centered(Variable.Canonical"Types.Basic.Grammar.Modifier"),
 								function(ModifiedGrammar)
-									ModifiedGrammar.InitialPattern = Grammar.InitialPattern
+									ModifiedGrammar.InitialPattern = ResumePattern
 									return ModifiedGrammar
 								end
 							)

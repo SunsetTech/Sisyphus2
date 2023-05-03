@@ -1,5 +1,5 @@
 local Vlpeg = require"Sisyphus2.Vlpeg"
-
+local Tools = require"Moonrise.Tools"
 local OOP = require"Moonrise.OOP"
 
 ---@class Sisyphus2.Compiler.Objects.Nested.PEG.Debug : Sisyphus2.Compiler.Objects.Nested.PEG.Base
@@ -20,13 +20,24 @@ function Debug:Decompose(Canonical)
 			Vlpeg.Immediate(
 				Vlpeg.Pattern(0),
 				function(Subject, Pos)
+					Tools.Debug.Format"trying to match %s"(self.SubPattern:ToString())
+					Tools.Debug.Format"  At `\27[4m\27[31m%s\27[0m..`"(Subject:sub(Pos, Pos+20):gsub("\n"," "):gsub("\t"," "))
+					Tools.Debug.Push()
 					return Pos
 				end
 			),
-			self.SubPattern(Canonical),
+			Vlpeg.Immediate(
+				self.SubPattern(Canonical),
+				function(_,Pos,...)
+					Tools.Debug.Print("<-", ...)
+					return Pos, ...
+				end
+			),
 			Vlpeg.Immediate(
 				Vlpeg.Pattern(0),
 				function(_,Pos)
+					Tools.Debug.Pop()
+					Tools.Debug.Print"Success"
 					return Pos
 				end
 			)
@@ -34,6 +45,8 @@ function Debug:Decompose(Canonical)
 		Vlpeg.Immediate(
 			Vlpeg.Pattern(0),
 			function()
+				Tools.Debug.Pop()
+				Tools.Debug.Print"Fail"
 				return false
 			end
 		) * (Vlpeg.Pattern(1) - Vlpeg.Pattern(1))
@@ -41,16 +54,15 @@ function Debug:Decompose(Canonical)
 
 end
 
-function Debug:Copy()
+Debug.Copy = function(self)
 	return Debug(-self.SubPattern)
-end
+end;
 
-function Debug:ToString()
-	return "`".. tostring(self.SubPattern) .."`"
-end
+Debug.ToString = function(self)
+	return "`".. self.SubPattern:ToString()
+end;
 
 return Debug
-
 --[=[
 local Tools = require"Moonrise.Tools"
 

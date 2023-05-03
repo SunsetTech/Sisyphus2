@@ -1,8 +1,8 @@
 local Import = require"Toolbox.Import"
 
-local Compiler = require"Sisyphus.Compiler"
+local Compiler = require"Sisyphus2.Compiler"
 local Object = Compiler.Object
-local CanonicalName = Compiler.Objects.CanonicalName
+local CanonicalName = Compiler.Objects2.CanonicalName
 local Nested = Compiler.Objects.Nested
 local PEG = Nested.PEG
 local Variable = PEG.Variable

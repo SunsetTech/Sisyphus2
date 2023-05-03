@@ -36,7 +36,7 @@ Package = {
 	
 	ChangeGrammar = function(Pattern)
 		return Package.DynamicParse(
-			PEG.Apply(
+			PEG.Debug(PEG.Apply(
 				PEG.Sequence{Pattern, Static.GetEnvironment}, 
 				function(NewGrammar, Environment)
 					--Tools.Error.CallerAssert(NewGrammar%"Aliasable.Grammar")
@@ -46,7 +46,7 @@ Package = {
 							Variables = Tools.Table.Copy(Environment.Variables);
 						}
 				end
-			)
+			))
 		)
 	end;
 

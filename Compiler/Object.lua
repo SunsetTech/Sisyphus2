@@ -86,6 +86,7 @@ function Object:__div(Type) -- /"Type" Iteratively decomposes until it's of Type
 end;
 
 function Object:__tostring()
+	--no good, it gets overriden
 	if self.ToString then
 		return self:ToString()
 	else
@@ -93,7 +94,12 @@ function Object:__tostring()
 	end
 end;
 
+function Object:ToString()
+	return type(self)
+end
+
 function Object:Initialize(Instance, Typename)
+	assert(type(Typename) == "string")
 	print(Typename)
 	Instance.TypeParts = {}
 

@@ -24,6 +24,7 @@ end
 function CanonicalName:Copy()
 	return CanonicalName(self.Name, self.Namespace and -self.Namespace or nil)
 end
+
 return CanonicalName
 --local Import = require"Moonrise.Import"
 

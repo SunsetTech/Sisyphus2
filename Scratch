@@ -1,0 +1,2 @@
+Template A<Data.String A, Data.String B> Struct
+Template B<Templates.A Argument> Templates.Join<:Argument.A :Argument.B>

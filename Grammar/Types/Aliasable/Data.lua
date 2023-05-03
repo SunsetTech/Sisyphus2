@@ -10,7 +10,6 @@ local Variable = PEG.Variable
 
 local Construct = Import.Module.Relative"Objects.Construct"
 local Incomplete = Import.Module.Relative"Objects.Incomplete"
-
 local function CreateNamespaceFor(Entry, Canonical)
 	local Namespace = Aliasable.Namespace{
 		[Canonical.Name] = Entry;

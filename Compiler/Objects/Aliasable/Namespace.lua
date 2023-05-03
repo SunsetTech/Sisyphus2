@@ -5,6 +5,9 @@ local Basic = Import.Module.Relative"Objects.Basic"
 
 local OOP = require"Moonrise.OOP"
 
+---@class Sisyphus2.Compiler.Objects.Aliasable.Namespace : Sisyphus2.Compiler.Object
+---@operator call:Sisyphus2.Compiler.Objects.Aliasable.Namespace
+---@field Children Sisyphus2.Compiler.Objects.Map
 local Namespace = OOP.Declarator.Shortcuts(
 	"Sisyphus2.Compiler.Objects.Aliasable.Namespace", {
 		require"Sisyphus2.Compiler.Object"
