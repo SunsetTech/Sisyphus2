@@ -12,8 +12,7 @@ local Objects = Import.Module.Relative"Objects"
 local Static = Objects.Static
 local Construct = Objects.Construct
 
-
-local Utils = require"Sisyphus2.Grammar.Types.Basic.Template.Utils"
+local Definition = require"Sisyphus2.Grammar.Types.Basic.Template.Definition"
 local TypeSpecifier = require"Sisyphus2.Grammar.Types.Basic.Template.TypeSpecifier"
 
 return Basic.Namespace{
@@ -67,7 +66,7 @@ return Basic.Namespace{
 					Variable.Canonical"Types.Basic.Template.Parameters",
 					Variable.Canonical"Types.Basic.Name.Target"
 				},
-				Utils.GenerateDefinitionGrammar
+				Definition.Generate
 			)
 		)
 	);

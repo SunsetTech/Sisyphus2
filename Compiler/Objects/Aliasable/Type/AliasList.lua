@@ -21,8 +21,7 @@ AliasList.Decompose = function(self)
 	local Variables = {}
 	--for Index, Name in pairs(self.Names) do
 	for Index = 1, #self.Names do local Name = self.Names[Index]
-		Variables[Index] = PEG.Debug(PEG.Sequence{PEG.Pattern":", PEG.Variable.Canonical(Name)})
-		print(Index, Name)
+		Variables[Index] = PEG.Sequence{PEG.Pattern":", PEG.Variable.Canonical(Name)}
 	end
 	return PEG.Select(Variables)
 end;

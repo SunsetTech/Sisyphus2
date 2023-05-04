@@ -41,10 +41,10 @@ return Template.Namespace{
 	Join = Template.Definition(
 		CanonicalName("Data", CanonicalName"String"),
 		Aliasable.Type.Definition(
-			PEG.Debug(Syntax.Tokens{
+			Syntax.Tokens{
 				PEG.Optional(PEG.Pattern"Join"), 
 				Construct.AliasableType"Data.Array<Data.String>"
-			}),
+			},
 			function(Arguments)
 				return table.concat(Arguments)
 			end

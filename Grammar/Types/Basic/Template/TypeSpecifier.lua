@@ -5,11 +5,12 @@ local TypeSpecifier = {}
 
 ---@param Namespace Sisyphus2.Compiler.Objects.Aliasable.Namespace
 ---@param Specifier Sisyphus2.Compiler.Objects.CanonicalName
----@return Sisyphus2.Compiler.Objects.Aliasable.Namespace
+---@return Sisyphus2.Compiler.Objects.Aliasable.Namespace?
 TypeSpecifier.Lookup = function(Namespace, Specifier)
 	local Result = Namespace.Children.Entries[Specifier.Name]
+	if Result == nil then return end
 	---@cast Result Sisyphus2.Compiler.Objects.Aliasable.Namespace
-	assert(Result ~= nil, "Couldn't find ".. Specifier())
+	--assert(Result ~= nil, "Couldn't find ".. Specifier())
 	if Specifier.Namespace then assert(Result%"Aliasable.Namespace") end
 	return 
 		Specifier.Namespace
@@ -17,23 +18,46 @@ TypeSpecifier.Lookup = function(Namespace, Specifier)
 		or Result
 end
 
+function TypeSpecifier.GetEnd(Specifier)
+	return Specifier.Namespace and TypeSpecifier.GetEnd(Specifier.Namespace) or Specifier
+end
+
 function TypeSpecifier.GetCompleter(Specifier, Environment)
-	local TypeDefinition = TypeSpecifier.Lookup(Environment.Grammar.AliasableTypes, Specifier)
-	Tools.Error.CallerAssert(TypeDefinition%"Aliasable.Type.Definition" or TypeDefinition%"Aliasable.Type.Incomplete")
-	
+	local Definition
+	print(Environment.Using)
+	if Environment.Using then
+		for _, Locator in pairs(Environment.Using) do
+			local _Locator = Locator:Invert()
+			local _Specifier = Specifier:Invert()
+			TypeSpecifier.GetEnd(_Specifier).Namespace = _Locator
+			print("Looking up ", _Specifier())
+			Definition = TypeSpecifier.Lookup(Environment.Grammar.AliasableTypes, _Specifier:Invert())
+			if Definition and (Definition%"Aliasable.Type.Definition" or Definition%"Aliasable.Type.Incomplete") then
+				print("Found", Definition)
+				Specifier = _Specifier:Invert()
+				break
+			end
+		end
+		--error"?"
+	end
+	print(Specifier())
+	Definition = Definition or TypeSpecifier.Lookup(Environment.Grammar.AliasableTypes, Specifier)
+	assert(Definition)
+	Tools.Error.CallerAssert(Definition%"Aliasable.Type.Definition" or Definition%"Aliasable.Type.Incomplete")
+	print(Definition)
 	local CurrentGrammar = Environment.Grammar
 	local ResumePattern = CurrentGrammar.InitialPattern
 	
-	if TypeDefinition%"Aliasable.Type.Definition.Incomplete" then
+	if Definition%"Aliasable.Type.Definition.Incomplete" then
 		CurrentGrammar.InitialPattern = PEG.Apply(
-			PEG.Debug(TypeDefinition.Complete(Specifier)),
+			Definition.Complete(Specifier),
 			function(...)
 				CurrentGrammar.InitialPattern = ResumePattern
 				return ...
 			end
 		)
-	elseif TypeDefinition%"Aliasable.Type.Definition" then
-		CurrentGrammar.InitialPattern = PEG.Debug(
+	elseif Definition%"Aliasable.Type.Definition" then
+		CurrentGrammar.InitialPattern = 
 			PEG.Apply(
 				PEG.Pattern(0),
 				function()
@@ -41,7 +65,7 @@ function TypeSpecifier.GetCompleter(Specifier, Environment)
 					return Specifier
 				end
 			)
-		)
+		
 	end
 	return CurrentGrammar
 end

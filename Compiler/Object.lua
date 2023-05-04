@@ -77,9 +77,8 @@ local function GetType(Of)
 end
 
 function Object:__div(Type) -- /"Type" Iteratively decomposes until it's of Type
-	assert(type(Type) == "table")
 	local Decomposed = self
-	while(GetType(Decomposed) ~= Type) do
+	while not GetType(Decomposed):match(Type .."$") do
 		Decomposed = Decomposed()
 	end
 	return Decomposed
@@ -99,8 +98,11 @@ function Object:ToString()
 end
 
 function Object:Initialize(Instance, Typename)
-	assert(type(Typename) == "string")
+	print(Instance)
+	Tools.Debug.PrintCaller(2)
+	error"??????"
 	print(Typename)
+	assert(type(Typename) == "string")
 	Instance.TypeParts = {}
 
 	for Index, SubType in pairs(Tools.String.Explode(Typename, ".")) do

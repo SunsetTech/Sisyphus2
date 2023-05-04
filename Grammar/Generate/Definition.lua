@@ -1,22 +1,87 @@
 local Import = require"Toolbox.Import"
-local Functional = require"Toolbox.Tools.Functional"
-
 
 local Compiler = require"Sisyphus2.Compiler"
-local PEG = Compiler.Objects.Nested.PEG
+local CanonicalName = Compiler.Objects.CanonicalName
+
 local Aliasable = Compiler.Objects.Aliasable
 local Template = Compiler.Objects.Template
 
-local Argument = Import.Module.Sister"Argument"
-local Type = Import.Module.Sister"Type"
+local PEG = require"Sisyphus2.Compiler.Objects.Nested.PEG"
 
-local Parse = Import.Module.Relative"Objects.Parse"
-local Static = Import.Module.Relative"Objects.Static"
-local Syntax = Import.Module.Relative"Objects.Syntax"
+local Argument = require"Sisyphus2.Grammar.Generate.Argument"
+
+local Objects = Import.Module.Relative"Objects"
+local Syntax = Objects.Syntax
+local Static = Objects.Static
+local Construct = Objects.Construct
 
 local Definition = {}
 
-function Definition.Boxer(...)
+function Definition.Returns(...) -- I forget why this was necessary
+	return Compiler.Transform.Incomplete(
+		{...},
+		function(...)
+			return ...
+		end
+	)
+end
+
+function Definition.Variables(Parameters)
+	local Variables = Template.Namespace()
+	local GeneratedTypes = Aliasable.Namespace()
+
+	for Index, Parameter in pairs(Parameters) do
+		if Parameter.Specifier.GeneratedTypes then
+			GeneratedTypes = GeneratedTypes + Parameter.Specifier.GeneratedTypes
+		end
+		Variables.Children:Add(
+			Parameter.Name, Template.Definition(
+				Parameter.Specifier.Target,
+				Aliasable.Type.Definition(
+					PEG.Pattern(Parameter.Name),
+					Argument.Resolver(Parameter.Name)
+				)
+			)
+		);
+	end
+
+	return Variables, GeneratedTypes
+end
+
+function Definition.Grammar(Name, Parameters, Basetype, Environment)
+	local CurrentGrammar = Environment.Grammar
+
+	local Variables, GeneratedTypes = Definition.GetParameterTypes(Parameters)
+	local DefinitionGrammar = Template.Grammar(
+		Aliasable.Grammar(
+			CurrentGrammar.InitialPattern,
+			CurrentGrammar.AliasableTypes + GeneratedTypes,
+			CurrentGrammar.BasicTypes,
+			CurrentGrammar.Syntax,
+			CurrentGrammar.Information
+		),
+		Template.Namespace{
+			Variables = Variables;
+		}
+	)
+	DefinitionGrammar = DefinitionGrammar/"Aliasable.Grammar"
+
+	local BasetypeRule = CanonicalName(Basetype:Invert()(), CanonicalName"Types.Aliasable")()
+	
+	DefinitionGrammar.InitialPattern = PEG.Apply( --Edit the initial pattern to match Basetype
+		PEG.Apply(
+			Construct.Centered(
+				Construct.AliasableType(Basetype:Invert()())
+			) , --The returns matching the type, either values or a resolvable representing the unfinished transform
+			Definition.Returns
+		),
+		Utils.DefinitionGenerator(Basetype, Name, Parameters, GeneratedTypes)
+	)
+
+	return DefinitionGrammar
+end
+
+--[[function Definition.Boxer(...)
 	return Compiler.Transform.Incomplete(
 		{...},
 		Functional.Return
@@ -95,6 +160,6 @@ function Definition.Grammar(Name, Parameters, Basetype, Environment)
 	)
 	
 	return DefinitionGrammar
-end
+end]]
 
 return Definition

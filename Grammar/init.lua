@@ -29,7 +29,7 @@ local TypeSpecifiers = Vlpeg.Match( --Hack to make specified completed types ava
 		Grammar = AliasableGrammar;
 		Variables = {};
 	}
-) --TODO why exactly is this needed?
+) --TODO why exactly is this needed? it's for Join i think
 
 for _, TypeSpecifier in pairs(TypeSpecifiers) do
 	if TypeSpecifier.GeneratedTypes then

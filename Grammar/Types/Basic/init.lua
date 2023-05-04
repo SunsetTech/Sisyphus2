@@ -16,7 +16,7 @@ return Basic.Namespace{
 
 	Modified = Basic.Type.Definition(
 		Construct.DynamicParse(
-			Construct.Invocation( --TODO:Implement this function
+			Construct.Invocation( 
 				"@",
 				Construct.ArgumentList{Variable.Canonical"Types.Basic.Grammar.Modifier"},
 				function(Grammar)

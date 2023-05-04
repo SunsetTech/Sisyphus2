@@ -13,7 +13,7 @@ local Static = Import.Module.Relative"Objects.Static"
 
 return Basic.Type.Set{
 	If = Basic.Type.Definition(
-		PEG.Debug(Syntax.Tokens{
+		Syntax.Tokens{
 			PEG.Pattern"If",
 			Construct.ChangeGrammar(
 				PEG.Apply(
@@ -44,5 +44,5 @@ return Basic.Type.Set{
 				)
 			)
 		}
-	));
+	);
 }

@@ -17,27 +17,31 @@ local Construct = Import.Module.Relative"Objects.Construct"
 return Basic.Type.Set{
 	Modifier = Basic.Type.Set{
 		--Templated parse that takes a Grammar.Modifier and uses the new grammar to match and return a.. Grammar.Modifier.
-		Using = Basic.Type.Definition(
+		Using = Basic.Type.Definition( --broken
 			Construct.DynamicParse(
 				Construct.Invocation(
 					"Using",
 					Construct.ArgumentList{Variable.Canonical"Types.Basic.Name.Target"},
 					function(NamespaceLocator, Environment)
 						print(NamespaceLocator(), Environment.Grammar)
-						error"?"
-						Grammar.InitialPattern =
+						local Using = Environment.Using or {}
+						table.insert(Using, NamespaceLocator)
+						local Resume = Environment.Grammar.InitialPattern
+						Environment.Grammar.InitialPattern =
 							PEG.Apply(
 								Construct.Centered(Variable.Canonical"Types.Basic.Grammar.Modifier"),
 								function(ModifiedGrammar)
-									ModifiedGrammar.InitialPattern = Grammar.InitialPattern
+									ModifiedGrammar.InitialPattern = Resume
+									table.remove(Using)
 									return ModifiedGrammar
 								end
 							)
 						
 						return
-							Grammar/"userdata", {
-								Grammar = Grammar;
+							Environment.Grammar/"userdata", {
+								Grammar = Environment.Grammar;
 								Variables = {};
+								Using = Using;
 							}
 					end
 				)
@@ -51,12 +55,12 @@ return Basic.Type.Set{
 					"With",
 					Construct.ArgumentList{Variable.Canonical"Types.Basic.Grammar.Modifier"},
 					function(Grammar, Environment)
-						local ResumePattern = Grammar.InitialPattern
+						local InitialPattern = Grammar.InitialPattern
 						Grammar.InitialPattern =
 							PEG.Apply(
 								Construct.Centered(Variable.Canonical"Types.Basic.Grammar.Modifier"),
 								function(ModifiedGrammar)
-									ModifiedGrammar.InitialPattern = ResumePattern
+									ModifiedGrammar.InitialPattern = InitialPattern
 									return ModifiedGrammar
 								end
 							)
@@ -65,6 +69,7 @@ return Basic.Type.Set{
 							Grammar/"userdata", {
 								Grammar = Grammar;
 								Variables = {};
+								Using = Environment.Using
 							}
 					end
 				)
@@ -94,7 +99,8 @@ return Basic.Type.Set{
 							CurrentGrammar/"userdata",
 							Contents, 1, {
 								Grammar = CurrentGrammar;
-								Variables = {};
+								Variables = Environment.Variables;
+								Using = Environment.Using;
 							}
 						)
 						
@@ -126,6 +132,7 @@ return Basic.Type.Set{
 					)
 				),
 				function(Declarations, Environment)
+					print(Environment.Variables.Test)
 					local Namespace = Template.Namespace()
 					local GeneratedTypes = Aliasable.Namespace()
 

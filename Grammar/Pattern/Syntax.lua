@@ -21,10 +21,11 @@ Package = {
 		return Package.Concatenate(Static.Whitespace^0, ...)
 	end;
 
-	Array = function(Pattern, Seperator, Joiner)
+	--[[Array = function(Pattern, Seperator, Joiner) --Unused
+		error"?"
 		Joiner = Joiner or Package.Tokens
 		return Joiner(Pattern,Joiner(Seperator, Pattern)^0)
-	end;
+	end;]]
 }
 
 return Package

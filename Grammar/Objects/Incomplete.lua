@@ -2,7 +2,7 @@ local Import = require"Toolbox.Import"
 
 local Compiler = require"Sisyphus2.Compiler"
 local Object = Compiler.Object
-local CanonicalName = Compiler.Objects2.CanonicalName
+local CanonicalName = Compiler.Objects.CanonicalName
 local Nested = Compiler.Objects.Nested
 local PEG = Nested.PEG
 local Variable = PEG.Variable
@@ -13,8 +13,9 @@ local Construct = Import.Module.Relative"Objects.Construct"
 local Static = Import.Module.Relative"Objects.Static"
 local Syntax = Import.Module.Relative"Objects.Syntax"
 
-return Object(
-	"Aliasable.Type.Definition.Incomplete", {
+--a templated template
+return Object( --TODO migrate to Moonrise.OOP
+	"Aliasable.Type.Definition.Incomplete", { 
 		Construct = function(self, Pattern, Complete, Syntax, AliasableTypes, BasicTypes, Canonical)
 			self.Complete = Complete
 			self.Pattern = Pattern or PEG.Pattern(true)

@@ -14,29 +14,45 @@ local Static = Objects.Static
 local Construct = Objects.Construct
 local Generate = require"Sisyphus2.Grammar.Generate"
 
-local Utils = {}
+local Definition = {}
 
-function Utils.InvertName(Canonical)
-	local Inverted = Compiler.Objects.CanonicalName(Canonical.Name)
-	while(Canonical.Namespace) do
-		Canonical = Canonical.Namespace
-		Inverted = Compiler.Objects.CanonicalName(Canonical.Name, Inverted)
-	end
-	return Inverted
-end
-
-function Utils.CreateArgumentsPattern(Parameters)
+---Constructs the syntax for capturing arguments to the template
+function Definition.Arguments(Parameters)
 	local ArgumentPatterns = {}
 
 	for Index, Parameter in pairs(Parameters) do
-		ArgumentPatterns[Index] = Construct.AliasableType(Utils.InvertName(Parameter.Specifier.Target)())
+		ArgumentPatterns[Index] = Construct.AliasableType(Parameter.Specifier.Target:Invert()())
 	end
 
 	return Construct.ArgumentList(ArgumentPatterns)
 end
 
-function Utils.DefinitionGenerator(Basetype, Name, Parameters, GeneratedTypes)
-	return function(Finish)
+function Definition.Invoker(Parameters, Body) --This is where we can construct the return object
+	return function(Environment, ...)
+		local Arguments = {...}
+		local OldValues = {}
+		
+		--for Index, Parameter in pairs(Parameters) do
+		for Index = 1,#Parameters do
+			local Parameter = Parameters[Index]
+			Environment.Variables[Parameter.Name] = Arguments[Index]
+			OldValues[Parameter.Name] = Environment.Variables[Parameter.Name]
+		end
+		
+		local Returns = {Body(Environment)}
+		
+		for Index = 1,#Parameters do
+			local Parameter = Parameters[Index]
+			Environment.Variables[Parameter.Name] = OldValues[Parameter.Name]
+		end
+		
+		return table.unpack(Returns)
+	end
+end
+
+--Constructs the template grammar for the newly defined template
+function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
+	return function(Body)
 		return 
 			Generate.Namespace.Template(
 				Template.Definition(
@@ -46,22 +62,10 @@ function Utils.DefinitionGenerator(Basetype, Name, Parameters, GeneratedTypes)
 							Static.GetEnvironment,
 							Syntax.Tokens{
 								PEG.Optional(PEG.Pattern(Name.Name)),
-								Utils.CreateArgumentsPattern(Parameters),
+								Definition.Arguments(Parameters),
 							}
 						},
-						function(Environment, ...)
-							local Arguments = {...}
-							local OldValues = {}
-							for Index, Parameter in pairs(Parameters) do
-								Environment.Variables[Parameter.Name] = Arguments[Index]
-								OldValues[Parameter.Name] = Environment.Variables[Parameter.Name]
-							end
-							local Returns = {Finish(Environment)}
-							for Name, Value in pairs(OldValues) do
-								Environment.Variables[Name] = Value
-							end
-							return table.unpack(Returns)
-						end
+						Definition.Invoker(Parameters, Body)
 					)
 				),
 				Name
@@ -72,7 +76,7 @@ end
 
 ---fuck how do we even annotate this
 ---@param ... any
-function Utils.BoxReturns(...) -- I forget why this was necessary
+function Definition.Return(...) -- I forget why this was necessary
 	return Compiler.Transform.Incomplete(
 		{...},
 		function(...)
@@ -81,17 +85,7 @@ function Utils.BoxReturns(...) -- I forget why this was necessary
 	)
 end
 
-function Utils.CreateValueLookup(Location)
-	return function()
-		return Compiler.Transform.Resolvable(
-			function(Environment)
-				return Environment.Variables[Location]
-			end
-		)
-	end
-end
-
-function Utils.GetParameterTypes(Parameters)
+function Definition.GenerateVariables(Parameters)
 	local Variables = Template.Namespace()
 	local GeneratedTypes = Aliasable.Namespace()
 
@@ -103,8 +97,8 @@ function Utils.GetParameterTypes(Parameters)
 			Parameter.Name, Template.Definition(
 				Parameter.Specifier.Target,
 				Aliasable.Type.Definition(
-					PEG.Debug(PEG.Pattern(Parameter.Name)),
-					Utils.CreateValueLookup(Parameter.Name)
+					PEG.Pattern(Parameter.Name),
+					Generate.Argument.Resolver(Parameter.Name)
 				)
 			)
 		);
@@ -113,11 +107,10 @@ function Utils.GetParameterTypes(Parameters)
 	return Variables, GeneratedTypes
 end
 
---
-function Utils.GenerateDefinitionGrammar(Name, Parameters, Basetype, Environment)
+function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates a pattern that grabs an invocation of Basetype and then uses it to construct a template definition
 	local CurrentGrammar = Environment.Grammar
 
-	local Variables, GeneratedTypes = Utils.GetParameterTypes(Parameters)
+	local Variables, GeneratedTypes = Definition.GenerateVariables(Parameters)
 	local DefinitionGrammar = Template.Grammar(
 		Aliasable.Grammar(
 			CurrentGrammar.InitialPattern,
@@ -132,21 +125,17 @@ function Utils.GenerateDefinitionGrammar(Name, Parameters, Basetype, Environment
 	)
 	DefinitionGrammar = DefinitionGrammar/"Aliasable.Grammar"
 
-	local BasetypeRule = CanonicalName(Utils.InvertName(Basetype)(), CanonicalName"Types.Aliasable")()
-	
 	DefinitionGrammar.InitialPattern = PEG.Apply( --Edit the initial pattern to match Basetype
 		PEG.Apply(
-			PEG.Debug(
-				Construct.Centered(
-					Construct.AliasableType(Utils.InvertName(Basetype)())
-				)
-			), --The returns matching the type, either values or a resolvable representing the unfinished transform
-			Utils.BoxReturns
+			Construct.Centered(
+				Construct.AliasableType(Basetype:Invert()())
+			) , --The returns matching the type, either values or a resolvable representing the unfinished transform
+			Definition.Return
 		),
-		Utils.DefinitionGenerator(Basetype, Name, Parameters, GeneratedTypes)
+		Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 	)
 
 	return DefinitionGrammar
 end
 
-return Utils
+return Definition

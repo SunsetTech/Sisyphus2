@@ -56,7 +56,7 @@ return Aliasable.Namespace {
 			Close = Variable.Sibling"Delimiter";
 			Contents = PEG.Capture(
 				PEG.All(
-					PEG.Dematch(
+					require"Sisyphus_Old.Compiler.Objects.Nested.PEG.Dematch"(
 						PEG.Pattern(1),
 						Variable.Sibling"Delimiter"
 					)

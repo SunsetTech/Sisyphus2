@@ -98,7 +98,7 @@ function Type.Generic(Pattern, TypeParameters, Specify, ...)
 	)
 end;
 
-function Type.Mask(Pattern, TypeArguments, Specify, ...)
+function Type.Mask(Pattern, TypeArguments, Specify, ...) --What was this
 	return Basic.Type.Definition(
 		Syntax.Tokens{
 			Pattern,
@@ -107,7 +107,7 @@ function Type.Mask(Pattern, TypeArguments, Specify, ...)
 					PEG.Sequence{
 						Static.GetEnvironment,
 						PEG.Stored"Basetype",
-						TypeParameters or PEG.Pattern(0)
+						TypeArguments or PEG.Pattern(0)
 					},
 					Specify
 				)

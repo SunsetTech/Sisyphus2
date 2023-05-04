@@ -13,11 +13,10 @@ local Static = Import.Module.Sister"Static"
 local Package
 
 Package = {
-	DynamicParse = function(Pattern)
+	DynamicParse = function(Pattern) --Matches Pattern which should produce an lpeg grammar/pattern and any number of arguments, then jumps to the returned grammar at the current position
 		return PEG.Immediate(
 			Pattern,
 			function(Subject, Position, Grammar, ...)
-				--Tools.Error.CallerAssert(type(Grammar) == "userdata", "Expected a userdata(lpeg pattern)")
 				return Vlpeg.Match(
 					Vlpeg.Apply(
 						Vlpeg.Sequence(
@@ -34,9 +33,9 @@ Package = {
 		)
 	end;
 	
-	ChangeGrammar = function(Pattern)
+	ChangeGrammar = function(Pattern) --matches Pattern which should produce an Aliasable.Grammar, then return it and a copy of the current state to DynamicParse
 		return Package.DynamicParse(
-			PEG.Debug(PEG.Apply(
+			PEG.Apply(
 				PEG.Sequence{Pattern, Static.GetEnvironment}, 
 				function(NewGrammar, Environment)
 					--Tools.Error.CallerAssert(NewGrammar%"Aliasable.Grammar")
@@ -46,7 +45,7 @@ Package = {
 							Variables = Tools.Table.Copy(Environment.Variables);
 						}
 				end
-			))
+			)
 		)
 	end;
 

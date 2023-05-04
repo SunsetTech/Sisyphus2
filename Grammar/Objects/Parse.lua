@@ -114,7 +114,7 @@ Parse = {
 
 	Aliasable = function(Name)
 		assert(Name)
-		return PEG.Debug(PEG.Sequence{
+		return PEG.Sequence{
 			PEG.Group(PEG.Constant(Name), "Basetype"),
 			PEG.Select{
 				Variable.Canonical(
@@ -128,7 +128,7 @@ Parse = {
 				}
 			},
 			PEG.Group(PEG.Constant(nil), "Basetype"),
-		})
+		}
 	end;
 
 	Array = function(ArgumentPattern)

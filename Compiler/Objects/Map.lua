@@ -1,6 +1,8 @@
 local Tools = require"Moonrise.Tools"
 local type = Tools.Inspect.GetType
 
+local OrderedMap = require"Moonrise.Object.OrderedMap"
+
 local OOP = require"Moonrise.OOP"
 
 ---@class Sisyphus2.Compiler.Objects.Map:Sisyphus2.Compiler.Object
