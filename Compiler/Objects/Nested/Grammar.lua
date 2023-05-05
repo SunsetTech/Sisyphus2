@@ -1,6 +1,5 @@
-local Pretty = require"Moonrise.Tools.Pretty"
 local Namer = require"Sisyphus2.Compiler.Objects.Namer"
-local Merger = require"Sisyphus.Compiler.Objects.Merger"
+local Merger = require"Sisyphus2.Compiler.Objects.Merger"
 local Flat = require"Sisyphus2.Compiler.Objects.Flat"
 local Nested = {
 	Rule = require"Sisyphus2.Compiler.Objects.Nested.Rule"
@@ -21,7 +20,6 @@ Grammar.Initialize = function(_, self, Rules, Base, _Rules)
 		self.Rules = Namer({"Nested.Grammar", "Nested.Rule"}, Rules)
 	end
 	self.Base = Base or Flat.Grammar()
-	assert(self.Base%"Flat.Grammar")
 end;
 
 Grammar.Decompose = function(self, Canonical)
@@ -45,18 +43,21 @@ end;
 
 
 Grammar.Copy = function(self)
-	return Grammar(nil, -self.Base, -self.Rules)
+	local Instance = Grammar(nil, -self.Base, -self.Rules)
+	return Instance
 end;
 
 Grammar.Merge = function(Into, From)
 	if From.Base then
 		if Into.Base then
-			Into.Base = Into.Base + From.Base
+			--Into.Base = Into.Base + From.Base
+			Into.Base:Merge(From.Base)
 		else
 			Into.Base = From.Base
 		end
 	end
-	Into.Rules = Namer({"Nested.Grammar", "Nested.Rule"}) + {Into.Rules, From.Rules}
+	--Into.Rules = Namer({"Nested.Grammar", "Nested.Rule"}) + {Into.Rules, From.Rules}
+	Into.Rules:Merge(From.Rules)
 end;
 
 return Grammar

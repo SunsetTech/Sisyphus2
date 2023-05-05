@@ -23,18 +23,19 @@ function Object:__call(...) --Decompose
 end;
 
 function Object:__unm() --Copy
+	--Tools.Debug.PrintCaller()
 	local New = self:Copy()
-	assert(OOP.Reflection.Type.Of(getmetatable(self), New))
+	--assert(OOP.Reflection.Type.Of(getmetatable(self), New))
 	return New
 end;
 
 function Object:__add(Additions) --Merge
-	
+	--Tools.Debug.PrintCaller()	
 	if type(Additions) ~= "table" then
 		Additions = {Additions}
 	end
 
-	local Into = -self
+	local Into = self:Copy()
 	for Index = 1, #Additions do
 		local Addition = Additions[Index]	
 		Into:Merge(Addition)
@@ -43,15 +44,20 @@ function Object:__add(Additions) --Merge
 	return Into
 end;
 
+local Counts = {}
+local Cache = {}
 function Object:__mod(TypeQuery) --Typename lookup
 	local Typename = OOP.Reflection.Type.Name(self)
-	local TypeParts = {}
-	local Exploded = Tools.String.Explode(Typename,".")
-	--for Index, SubType in pairs(Tools.String.Explode(Typename, ".")) do
-	for Index = 1, #Exploded do
-		local SubType = Exploded[Index]
-		TypeParts[SubType] = Index
-		TypeParts[Index] = SubType
+	local TypeParts = Cache[Typename]
+	if not Cache[Typename] then
+		TypeParts = {}
+		local Exploded = Tools.String.Explode(Typename,".")
+		for Index = 1, #Exploded do
+			local SubType = Exploded[Index]
+			TypeParts[SubType] = Index
+			TypeParts[Index] = SubType
+		end
+		Cache[Typename] = TypeParts
 	end
 	
 	local QueryParts = Tools.String.Explode(TypeQuery, ".")
@@ -78,7 +84,7 @@ end
 
 function Object:__div(Type) -- /"Type" Iteratively decomposes until it's of Type
 	local Decomposed = self
-	while not GetType(Decomposed):match(Type .."$") do
+	while not OOP.Reflection.Type.Name(Decomposed):match(Type .."$") do
 		Decomposed = Decomposed()
 	end
 	return Decomposed
@@ -95,20 +101,6 @@ end;
 
 function Object:ToString()
 	return type(self)
-end
-
-function Object:Initialize(Instance, Typename)
-	print(Instance)
-	Tools.Debug.PrintCaller(2)
-	error"??????"
-	print(Typename)
-	assert(type(Typename) == "string")
-	Instance.TypeParts = {}
-
-	for Index, SubType in pairs(Tools.String.Explode(Typename, ".")) do
-		Instance.TypeParts[SubType] = Index
-		Instance.TypeParts[Index] = SubType
-	end
 end
 
 return Object

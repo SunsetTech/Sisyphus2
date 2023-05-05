@@ -1,4 +1,9 @@
 With File"A.sph"
 Templates <
-	Template C<Data.String Argument> Templates.Functions.Join<::A:Argument".">
+	Template C<Data.String Argument> Templates.Functions.Join<
+		::A 
+		:Argument 
+		"."
+		::C"!"
+	>
 >

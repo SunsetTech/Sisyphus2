@@ -9,8 +9,10 @@ local Sequence = OOP.Declarator.Shortcuts(
 	}
 )
 
-Sequence.Initialize = function(_, self, Parts)
-	self.Parts = Array("Nested.PEG", Parts)
+Sequence.Initialize = function(_, self, Parts, _Parts)
+	self.Parts = _Parts or Array("Nested.PEG", Parts)
+	self.Decompose = Sequence.Decompose
+	self.Copy = Sequence.Copy
 end;
 
 Sequence.Decompose = function(self, Canonical)
@@ -19,7 +21,7 @@ Sequence.Decompose = function(self, Canonical)
 end;
 
 Sequence.Copy = function(self)
-	return Sequence((-self.Parts).Items)
+	return Sequence(nil, (self.Parts:Copy()))
 end;
 
 Sequence.ToString = function(self)

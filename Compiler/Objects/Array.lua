@@ -16,9 +16,13 @@ Array.Initialize = function(_, self, Type, Items)
 		--Tools.Error.CallerAssert(type(Index) == "number", "Expected a numeric index, got ".. Index)
 		--Tools.Error.CallerAssert(Item%(self.Type), "Expected a ".. self.Type)
 	end
+	self.Decompose = Array.Decompose
+	self.Copy = Array.Copy
 end;
 
 Array.Decompose = function(self, ...)
+	local Count = select("#", ...)
+	local Args = {...}
 	local Decomposed = {}
 	
 	for Index = 1, #self.Items do
@@ -26,7 +30,7 @@ Array.Decompose = function(self, ...)
 		--Tools.Error.CallerAssert(type(Index) == "number", "Expected a numeric index, got ".. Index)
 		--Tools.Error.CallerAssert(Item%(self.Type), "Expected a ".. self.Type)
 	
-		Decomposed[Index] = Item(...)
+		Decomposed[Index] = Item(table.unpack(Args,1,Count))
 	end
 
 	return Decomposed
@@ -37,7 +41,7 @@ Array.Copy = function(self)
 	
 	for Index = 1, #self.Items do
 		local Item = self.Items[Index]
-		ItemsCopy[Index] = -Item
+		ItemsCopy[Index] = Item:Copy()
 	end
 	
 	return Array(self.Type, ItemsCopy)

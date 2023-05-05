@@ -16,6 +16,7 @@ local Map = OOP.Declarator.Shortcuts(
 )
 
 Map.Initialize = function(_, self, Types, Entries, _Entries)
+	error"Don't use me"
 	--print_caller_info()
 	self.Types =
 		type(Types) == "string"

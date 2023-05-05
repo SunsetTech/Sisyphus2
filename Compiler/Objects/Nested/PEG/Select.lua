@@ -15,8 +15,10 @@ local Select = OOP.Declarator.Shortcuts(
 	}
 )
 
-Select.Initialize = function(_, self, Options)
-	self.Options = Tools.Error.NotMine(Array,"Nested.PEG", Options)
+Select.Initialize = function(_, self, Options, _Options)
+	self.Options = _Options or Tools.Error.NotMine(Array,"Nested.PEG", Options)
+	self.Decompose = Select.Decompose
+	self.Copy = Select.Copy
 end;
 
 Select.Decompose = function(self, Canonical)
@@ -25,7 +27,7 @@ Select.Decompose = function(self, Canonical)
 end;
 
 Select.Copy = function(self)
-	return Select((-self.Options).Items)
+	return Select(nil, (self.Options:Copy()))
 end;
 
 Select.ToString = function(self)

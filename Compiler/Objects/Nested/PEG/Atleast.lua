@@ -16,7 +16,7 @@ function Atleast:Decompose(Canonical)
 end
 
 function Atleast:Copy()
-	return Atleast(self.Amount, -self.InnerPattern)
+	return Atleast(self.Amount, self.InnerPattern:Copy())
 end
 
 function Atleast:ToString()

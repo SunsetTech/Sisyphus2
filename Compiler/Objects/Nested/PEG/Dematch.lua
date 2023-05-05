@@ -5,18 +5,20 @@ local Dematch = OOP.Declarator.Shortcuts(
 	}
 )
 
-Dematch.Initialise = function(_, Instance, Pattern, Without)
+Dematch.Initialize = function(_, Instance, Pattern, Without)
+	assert(Pattern and Without)
 	Instance.Pattern = Pattern
 	Instance.Without = Without
+	print(Instance,Pattern,Without)
 end;
 
 Dematch.Decompose = function(self, Canonical)
-	assert(Canonical)
+	print(self,self.Pattern,self.Without)
 	return self.Pattern(Canonical) - self.Without(Canonical)
 end;
 
 Dematch.Copy = function(self)
-	return Dematch(-self.Pattern, -self.Without)
+	return Dematch(self.Pattern:Copy(), self.Without:Copy())
 end;
 
 Dematch.ToString = function(self)

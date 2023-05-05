@@ -24,7 +24,8 @@ Package = {
 			function(Environment)
 				--Tools.Error.CallerAssert(type(Environment) == "table", "oops")
 				local CurrentArguments = {}
-				for Index, Argument in pairs(Arguments) do
+				--for Index, Argument in pairs(Arguments) do
+				for Index = 1, #Arguments do local Argument = Arguments[Index]
 					local Type = type(Argument)
 					local Returns
 					if Type == "resolvable" then
@@ -35,7 +36,9 @@ Package = {
 					else
 						Returns = {Argument}
 					end
-					for _, Return in pairs(Returns) do
+					--for _, Return in pairs(Returns) do
+					for ReturnIndex = 1, #Returns do
+						local Return = Returns[ReturnIndex]
 						table.insert(CurrentArguments, Return)
 					end
 				end
@@ -55,7 +58,9 @@ Package = {
 			local Arguments = {...} 
 			
 			local Incomplete = false
-			for Index, Argument in pairs(Arguments) do --search for incomplete arguments
+			--for Index, Argument in pairs(Arguments) do --search for incomplete arguments
+			for Index = 1, #Arguments do
+				local Argument = Arguments[Index]
 				local Type = type(Argument)
 				
 				if Type == "resolvable" then

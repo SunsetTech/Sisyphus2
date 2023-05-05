@@ -1,4 +1,3 @@
-Using Data
 Templates<
-	Template A<String Argument> Templates.Functions.Join<:Argument"?">
+	Template A<Data.String Argument> Templates.Functions.Join<:Argument"?">
 >

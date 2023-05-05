@@ -20,6 +20,8 @@ Definition.Initialize = function(_, self, Pattern, Syntax, Types)
 	self.Pattern = Pattern
 	self.Syntax = Syntax or Nested.Grammar()
 	self.Types = Types or Basic.Namespace();
+	self.Decompose = Definition.Decompose
+	self.Copy = Definition.Copy
 end;
 
 Definition.Decompose = function(self)
@@ -31,7 +33,7 @@ Definition.Decompose = function(self)
 end;
 
 Definition.Copy = function(self)
-	return Definition(-self.Pattern, -self.Syntax, -self.Types)
+	return Definition(self.Pattern:Copy(), self.Syntax:Copy(), self.Types:Copy())
 end;
 
 return Definition

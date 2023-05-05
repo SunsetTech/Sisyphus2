@@ -10,7 +10,7 @@ local Template = {
 local function LookupAliasableType(In, Canonical)
 	if Canonical then
 		if In%"Aliasable.Namespace" then
-			return LookupAliasableType(In.Children.Entries[Canonical.Name], Canonical.Namespace)
+			return LookupAliasableType(In.Children.Entries:Get(Canonical.Name), Canonical.Namespace)
 		else
 			Tools.Error.CallerError(Tools.String.Format"Can't lookup %s in %s"(Canonical.Name, In))
 		end
@@ -21,14 +21,13 @@ local function LookupAliasableType(In, Canonical)
 end
 
 local function RegisterTemplates(AliasableTypes, Templates, Canonical)
-	print(Templates.Children)
-	for Name, Entry in pairs(Templates.Children.Entries) do
+	--for Name, Entry in pairs(Templates.Children.Entries) do
+	for Index = 1, Templates.Children.Entries:NumKeys() do
+		local Name, Entry = Templates.Children.Entries:GetPair(Index)
 		if Entry%"Template.Namespace" then
-			Tools.Error.NotMine(RegisterTemplates,AliasableTypes, Entry, CanonicalName(Name, Canonical))
+			RegisterTemplates(AliasableTypes, Entry, CanonicalName(Name, Canonical))
 		elseif Entry%"Template.Definition" then
-			assert(Entry.Basetype)
-			local AliasableType = Tools.Error.NotMine(LookupAliasableType,AliasableTypes, Entry.Basetype)
-			assert(AliasableType%"Aliasable.Type.Definition")
+			local AliasableType = LookupAliasableType(AliasableTypes, Entry.Basetype)
 			table.insert(AliasableType.Aliases.Names, CanonicalName(Name, Canonical)())
 		end
 	end
@@ -52,13 +51,13 @@ Grammar.Decompose = function(self) --Decomposes into an Aliasable.Grammar
 	local Copy = self.AliasableGrammar
 	Copy = Aliasable.Grammar(
 		Copy.InitialPattern,
-		-Copy.AliasableTypes,
+		Copy.AliasableTypes:Copy(),
 		Copy.BasicTypes,
 		Copy.Syntax,
 		Copy.Information
 	)
 
-	Tools.Error.NotMine(RegisterTemplates,
+	RegisterTemplates(
 		Copy.AliasableTypes, 
 		self.Templates,
 		CanonicalName"Types.Aliasable.Templates"
@@ -68,7 +67,7 @@ Grammar.Decompose = function(self) --Decomposes into an Aliasable.Grammar
 		"Templates",
 		Aliasable.Namespace()
 		+ {
-			(Copy.AliasableTypes.Children.Entries.Templates or Aliasable.Namespace()),
+			(Copy.AliasableTypes.Children.Entries:Get"Templates" or Aliasable.Namespace()),
 			self.Templates()
 		}
 	)

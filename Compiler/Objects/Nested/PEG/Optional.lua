@@ -19,7 +19,7 @@ Optional.Decompose = function(self, Canonical)
 end;
 
 Optional.Copy = function(self)
-	return Optional(-self.InnerPattern)
+	return Optional(self.InnerPattern:Copy())
 end;
 
 Optional.ToString = function(self)

@@ -19,7 +19,7 @@ function Capture:Decompose(Canonical)
 end
 
 function Capture:Copy()
-	return Capture(-self.SubPattern)
+	return Capture(self.SubPattern:Copy())
 end
 
 function Capture:ToString()

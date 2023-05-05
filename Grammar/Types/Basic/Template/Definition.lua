@@ -11,23 +11,23 @@ local PEG = require"Sisyphus2.Compiler.Objects.Nested.PEG"
 local Objects = Import.Module.Relative"Objects"
 local Syntax = Objects.Syntax
 local Static = Objects.Static
-local Construct = Objects.Construct
+local Parse = Objects.Construct
 local Generate = require"Sisyphus2.Grammar.Generate"
 
 local Definition = {}
 
----Constructs the syntax for capturing arguments to the template
+--Constructs the syntax for capturing arguments to the template
 function Definition.Arguments(Parameters)
 	local ArgumentPatterns = {}
 
 	for Index, Parameter in pairs(Parameters) do
-		ArgumentPatterns[Index] = Construct.AliasableType(Parameter.Specifier.Target:Invert()())
+		ArgumentPatterns[Index] = Parse.AliasableType(Parameter.Specifier.Target:Invert()())
 	end
 
-	return Construct.ArgumentList(ArgumentPatterns)
+	return Parse.ArgumentList(ArgumentPatterns)
 end
 
-function Definition.Invoker(Parameters, Body) --This is where we can construct the return object
+function Definition.Invoker(Parameters, Body) 
 	return function(Environment, ...)
 		local Arguments = {...}
 		local OldValues = {}
@@ -50,7 +50,7 @@ function Definition.Invoker(Parameters, Body) --This is where we can construct t
 	end
 end
 
---Constructs the template grammar for the newly defined template
+--Parses the template grammar for the newly defined template
 function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 	return function(Body)
 		return 
@@ -61,7 +61,9 @@ function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 						PEG.Sequence{
 							Static.GetEnvironment,
 							Syntax.Tokens{
-								PEG.Optional(PEG.Pattern(Name.Name)),
+								PEG.Optional(
+									PEG.Pattern(Name.Name)
+								),
 								Definition.Arguments(Parameters),
 							}
 						},
@@ -111,6 +113,9 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 	local CurrentGrammar = Environment.Grammar
 
 	local Variables, GeneratedTypes = Definition.GenerateVariables(Parameters)
+	local ArgumentPattern = Definition.Arguments(Parameters)
+	local VariablesNamespace = Template.Namespace()
+	VariablesNamespace.Children.Entries:Add("Variables", Variables)
 	local DefinitionGrammar = Template.Grammar(
 		Aliasable.Grammar(
 			CurrentGrammar.InitialPattern,
@@ -119,16 +124,13 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 			CurrentGrammar.Syntax,
 			CurrentGrammar.Information
 		),
-		Template.Namespace{
-			Variables = Variables;
-		}
+		VariablesNamespace + Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)(function(...) print(...) return "hello" end)
 	)
 	DefinitionGrammar = DefinitionGrammar/"Aliasable.Grammar"
-
 	DefinitionGrammar.InitialPattern = PEG.Apply( --Edit the initial pattern to match Basetype
 		PEG.Apply(
-			Construct.Centered(
-				Construct.AliasableType(Basetype:Invert()())
+			Parse.Centered(
+				Parse.AliasableType(Basetype(true))
 			) , --The returns matching the type, either values or a resolvable representing the unfinished transform
 			Definition.Return
 		),

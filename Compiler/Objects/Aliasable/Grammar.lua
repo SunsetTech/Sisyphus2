@@ -38,7 +38,13 @@ Grammar.Decompose = function(self)
 end;
 
 Grammar.Copy = function(self)
-	return Grammar(-self.InitialPattern, -self.AliasableTypes, -self.BasicTypes, -self.Syntax, Tools.Table.Copy(self.Information))
+	return Grammar(
+		self.InitialPattern:Copy(), 
+		self.AliasableTypes:Copy(), 
+		self.BasicTypes:Copy(), 
+		self.Syntax:Copy(), 
+		Tools.Table.Copy(self.Information)
+	)
 end;
 
 return Grammar

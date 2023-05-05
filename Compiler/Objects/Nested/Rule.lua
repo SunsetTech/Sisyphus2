@@ -14,13 +14,16 @@ end
 
 function Rule:Decompose(Canonical)
 	local Name = Canonical and Canonical() or 1
-	return Flat.Grammar{
+	local Decomposed = Flat.Grammar()
+	--[[{
 		[Name] = self.Pattern(Canonical);
-	}
+	}]]
+	Decomposed:SetRule(Name, self.Pattern(Canonical))
+	return Decomposed
 end
 
 function Rule:Copy()
-	return Rule(-self.Pattern)
+	return Rule(self.Pattern:Copy())
 end
 
 return Rule

@@ -1,6 +1,6 @@
 local Import = require"Moonrise.Import"
 
-local Map = Import.Module.Relative"Objects.Map"
+local Map = Import.Module.Relative"Objects.Map2"
 local Nested = Import.Module.Relative"Objects.Nested"
 local PEG = Nested.PEG
 local Variable = PEG.Variable
@@ -24,7 +24,9 @@ end;
 Set.Decompose = function(self)
 	local Options = {}
 	
-	for Name, _ in pairs(self.Children.Entries) do
+	--for Name, _ in pairs(self.Children.Entries) do
+	for Index = 1, self.Children.Entries:NumKeys() do
+		local Name = self.Children.Entries:GetPair(Index)
 		table.insert(Options, Variable.Child(Name))
 	end
 	

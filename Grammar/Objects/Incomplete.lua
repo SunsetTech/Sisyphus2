@@ -59,7 +59,7 @@ return Object( --TODO migrate to Moonrise.OOP
 		end;
 
 		Copy = function(self)
-			return -self.Pattern, self.Complete, -self.Syntax, -self.AliasableTypes, -self.BasicTypes, -self.Canonical
+			return self.Pattern:Copy(), self.Complete, -self.Syntax, -self.AliasableTypes, -self.BasicTypes, -self.Canonical
 		end;
 	}
 )

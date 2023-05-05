@@ -1,4 +1,4 @@
-local Map = require"Sisyphus2.Compiler.Objects.Map"
+local Map = require"Sisyphus2.Compiler.Objects.Map2"
 local Nested = require"Sisyphus2.Compiler.Objects.Nested"
 
 local OOP = require"Moonrise.OOP"
@@ -16,19 +16,22 @@ Namespace.Initialize = function(_, self, Children, _Children)
 	else
 		self.Children = Map({"Basic.Namespace", "Basic.Type.Definition", "Basic.Type.Set"},Children or {})
 	end
+	self.Decompose = Namespace.Decompose
+	self.Copy = Namespace.Copy
+	self.Merge = Namespace.Merge
 end;
 
 Namespace.Decompose = function(self) --into a Nested.Grammar
 	return 
 		Nested.Grammar(self.Children())
 end;
-
 Namespace.Copy = function(self)
-	return Namespace(nil, (-self.Children))
+	return Namespace(nil, self.Children:Copy())
 end;
 
 Namespace.Merge = function(Into, From)
-	Into.Children = Map({"Basic.Namespace","Basic.Type.Definition","Basic.Type.Set"},{}) + {Into.Children, From.Children}
+	Into.Children:Merge(From.Children)
+	--Into.Children = Map({"Basic.Namespace","Basic.Type.Definition","Basic.Type.Set"},{}) + {Into.Children, From.Children}
 end;
 
 return Namespace

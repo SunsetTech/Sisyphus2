@@ -20,6 +20,10 @@ Namer.Initialize = function(_, self, Types, Entries, _Entries)
 	else
 		self.Entries = OrderedMap(Entries)
 	end
+	self.Add = Namer.Add
+	self.Decompose = Namer.Decompose
+	self.Copy = Namer.Copy
+	self.Merge = Namer.Merge
 	--self.Entries = setmetatable(Entries, {__newindex = function(_,k,v) print_caller_info() print("newindex",k,v) rawset(Entries, k, v) end;})
 end;
 
@@ -61,14 +65,15 @@ Namer.Decompose = function(self, Canonical)
 end;
 
 Namer.Copy = function(self)
-	local EntriesCopy = OrderedMap{}
+	local EntriesCopy = OrderedMap()
 	--for Name, Entry in pairs(self.Entries) do
 	for NameIndex = 1, self.Entries:NumKeys() do
 		local Name, Entry = self.Entries:GetPair(NameIndex)
-		EntriesCopy:Add(Name, -Entry)
+		EntriesCopy:Add(Name, Entry:Copy())
 		--EntriesCopy[Name] = -Entry
 	end
-	return Namer(self.Types, nil, EntriesCopy)
+	local Return = Namer(self.Types, nil, EntriesCopy)
+	return Return
 end;
 
 Namer.Merge = function(Into, From)

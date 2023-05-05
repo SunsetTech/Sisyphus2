@@ -17,14 +17,20 @@ Grammar.Initialize = function(_, self, InitialPattern, Types, Syntax)
 	self.InitialPattern = InitialPattern
 	self.Types = Types or Basic.Namespace()
 	self.Syntax = Syntax or Nested.Grammar()
+	self.Decompose = Grammar.Decompose
 end;
 
 Grammar.Decompose = function(self)
-	return Nested.Grammar{
+	local Nested = Nested.Grammar()
+	Nested.Rules.Entries:Add(1, self.InitialPattern)
+	Nested.Rules.Entries:Add("Types", self.Types())
+	Nested.Rules.Entries:Add("Syntax", self.Syntax)
+	return Nested
+	--[[{
 		self.InitialPattern,
 		Types = self.Types();
 		Syntax = self.Syntax;
-	}
+	}]]
 end;
 
 return Grammar

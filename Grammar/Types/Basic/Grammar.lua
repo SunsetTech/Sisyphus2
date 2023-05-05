@@ -23,7 +23,6 @@ return Basic.Type.Set{
 					"Using",
 					Construct.ArgumentList{Variable.Canonical"Types.Basic.Name.Target"},
 					function(NamespaceLocator, Environment)
-						print(NamespaceLocator(), Environment.Grammar)
 						local Using = Environment.Using or {}
 						table.insert(Using, NamespaceLocator)
 						local Resume = Environment.Grammar.InitialPattern

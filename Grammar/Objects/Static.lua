@@ -1,5 +1,5 @@
-local PEG = require"Sisyphus.Compiler".Objects.Nested.PEG
-local Vlpeg = require"Sisyphus.Vlpeg"
+local PEG = require"Sisyphus2.Compiler".Objects.Nested.PEG
+local Vlpeg = require"Sisyphus2.Vlpeg"
 
 return {
 	Alpha = PEG.Range("az","AZ");

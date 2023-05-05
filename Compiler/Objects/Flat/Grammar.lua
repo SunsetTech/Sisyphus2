@@ -14,6 +14,10 @@ local Grammar = OOP.Declarator.Shortcuts(
 
 function Grammar:Initialize(Instance, Rules, _Rules)
 	Instance.Rules = _Rules or OrderedMap(Rules)
+	self.Decompose = Grammar.Decompose
+	self.Copy = Grammar.Copy
+	self.SetRule = Grammar.SetRule
+	self.Merge = Grammar.Merge
 end;
 
 function Grammar:Decompose()
@@ -21,12 +25,13 @@ function Grammar:Decompose()
 end;
 
 function Grammar:Copy()
-	local Rules = OrderedMap{}
+	local Rules = OrderedMap()
 	for Index = 1, self.Rules:NumKeys() do
 		local Name, Rule = self.Rules:GetPair(Index)
 		Rules:Add(Name, Rule)
 	end
-	return Grammar(nil, Rules)
+	local Copy = Grammar(nil, Rules)
+	return Copy
 end;
 		
 function Grammar:SetRule(Name, Rule)

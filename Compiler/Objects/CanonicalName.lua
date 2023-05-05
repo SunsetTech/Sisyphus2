@@ -15,14 +15,24 @@ local CanonicalName = OOP.Declarator.Shortcuts(
 function CanonicalName:Initialize(Instance, Name, Namespace)
 	Instance.Name = Name
 	Instance.Namespace = Namespace
+	self.Decompose = CanonicalName.Decompose
+	self.Copy = CanonicalName.Copy
+	self.Invert = CanonicalName.Invert
 end
 
-function CanonicalName:Decompose()
-	return self.Namespace and (self.Namespace() ..".".. self.Name) or self.Name
+function CanonicalName:Decompose(Reverse)
+	return 
+		self.Namespace 
+		and (
+			Reverse 
+			and (self.Name ..".".. self.Namespace(Reverse))
+			or (self.Namespace() ..".".. self.Name)
+		) 
+		or self.Name
 end
 
 function CanonicalName:Copy()
-	return CanonicalName(self.Name, self.Namespace and -self.Namespace or nil)
+	return CanonicalName(self.Name, self.Namespace and self.Namespace:Copy() or nil)
 end
 
 function CanonicalName:Invert()

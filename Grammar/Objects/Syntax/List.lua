@@ -13,6 +13,8 @@ local List = OOP.Declarator.Shortcuts(
 List.Initialize = function(_, self, Patterns, Seperator)
 	self.Patterns = Compiler.Objects.Array("Nested.PEG", Patterns)
 	self.Seperator = Seperator
+	self.Decompose = List.Decompose
+	self.Copy = List.Copy
 end;
 
 List.Decompose = function(self, Canonical)
