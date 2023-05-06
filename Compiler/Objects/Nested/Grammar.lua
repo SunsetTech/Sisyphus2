@@ -7,6 +7,10 @@ local Nested = {
 
 local OOP = require"Moonrise.OOP"
 
+---@class Sisyphus2.Compiler.Objects.Nested.Grammar : Sisyphus2.Compiler.Object
+---@operator call Sisyphus2.Compiler.Objects.Nested.Grammar
+---@field Rules SisyphusO.Compiler.Objects.Namer
+---@field Base Sisyphus2.Compiler.Objects.Flat.Grammar
 local Grammar = OOP.Declarator.Shortcuts(
 	"Sisyphus2.Compiler.Objects.Nested.Grammar", {
 		require"Sisyphus2.Compiler.Object"
@@ -34,7 +38,7 @@ Grammar.Decompose = function(self, Canonical)
 	end
 	
 	local Flattened = Merger("Flat.Grammar", ConvertedRules(Canonical))()
-	
+	--local Base = 
 	return 
 		Flattened
 		and self.Base + Flattened
@@ -47,17 +51,17 @@ Grammar.Copy = function(self)
 	return Instance
 end;
 
-Grammar.Merge = function(Into, From)
+Grammar.Merge = function(self, From)
 	if From.Base then
-		if Into.Base then
+		if self.Base then
 			--Into.Base = Into.Base + From.Base
-			Into.Base:Merge(From.Base)
+			self.Base:Merge(From.Base)
 		else
-			Into.Base = From.Base
+			self.Base = From.Base
 		end
 	end
 	--Into.Rules = Namer({"Nested.Grammar", "Nested.Rule"}) + {Into.Rules, From.Rules}
-	Into.Rules:Merge(From.Rules)
+	self.Rules:Merge(From.Rules)
 end;
 
 return Grammar

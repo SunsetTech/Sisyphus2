@@ -16,7 +16,6 @@ local Construct = Import.Module.Relative"Objects.Construct"
 
 return Basic.Type.Set{
 	Modifier = Basic.Type.Set{
-		--Templated parse that takes a Grammar.Modifier and uses the new grammar to match and return a.. Grammar.Modifier.
 		Using = Basic.Type.Definition( --broken
 			Construct.DynamicParse(
 				Construct.Invocation(
@@ -48,6 +47,7 @@ return Basic.Type.Set{
 		);
 
 
+		--Templated parse that takes a Grammar.Modifier and uses the new grammar to match and return a.. Grammar.Modifier.
 		With = Basic.Type.Definition(
 			Construct.DynamicParse(
 				Construct.Invocation(
@@ -86,6 +86,7 @@ return Basic.Type.Set{
 
 					if not CurrentGrammar.Information.Files[Path] then
 						local File = io.open(Path,"r")
+						assert(File)
 						local Contents = File:read"a"
 						File:close()
 						
@@ -131,14 +132,15 @@ return Basic.Type.Set{
 					)
 				),
 				function(Declarations, Environment)
-					print(Environment.Variables.Test)
 					local Namespace = Template.Namespace()
 					local GeneratedTypes = Aliasable.Namespace()
 
 					for _, Declaration in pairs(Declarations) do
-						Namespace = Namespace + Declaration.Namespace
+						--Namespace = Namespace + Declaration.Namespace
+						Namespace:Merge(Declaration.Namespace)
 						if Declaration.GeneratedTypes then
-							GeneratedTypes = GeneratedTypes + Declaration.GeneratedTypes
+							--GeneratedTypes = GeneratedTypes + Declaration.GeneratedTypes
+							GeneratedTypes:Merge(Declaration.GeneratedTypes)
 						end
 					end
 					

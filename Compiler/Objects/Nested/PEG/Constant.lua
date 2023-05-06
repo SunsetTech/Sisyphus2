@@ -11,6 +11,7 @@ local Constant = OOP.Declarator.Shortcuts(
 
 function Constant:Initialize(Instance, Value)
 	Instance.Value = Value
+	Instance.Decompose = Constant.Decompose
 end
 
 function Constant:Decompose(Canonical)

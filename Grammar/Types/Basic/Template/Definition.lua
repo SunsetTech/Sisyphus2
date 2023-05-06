@@ -39,8 +39,11 @@ function Definition.Invoker(Parameters, Body)
 			OldValues[Parameter.Name] = Environment.Variables[Parameter.Name]
 		end
 		
-		local Returns = {Body(Environment)}
-		
+		local LastBody = Environment.Body
+		Environment.Body = Body
+			local Returns = {Body(Environment)}
+		Environment.Body = LastBody
+
 		for Index = 1,#Parameters do
 			local Parameter = Parameters[Index]
 			Environment.Variables[Parameter.Name] = OldValues[Parameter.Name]
@@ -124,7 +127,15 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 			CurrentGrammar.Syntax,
 			CurrentGrammar.Information
 		),
-		VariablesNamespace + Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)(function(...) print(...) return "hello" end)
+		VariablesNamespace + Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)(
+			function(...) 
+				return Compiler.Transform.Resolvable(
+					function(Environment)
+						return Environment.Body(Environment)
+					end
+				) 
+			end
+		)
 	)
 	DefinitionGrammar = DefinitionGrammar/"Aliasable.Grammar"
 	DefinitionGrammar.InitialPattern = PEG.Apply( --Edit the initial pattern to match Basetype

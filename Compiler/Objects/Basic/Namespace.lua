@@ -14,7 +14,7 @@ Namespace.Initialize = function(_, self, Children, _Children)
 	if _Children then 
 		self.Children = _Children
 	else
-		self.Children = Map({"Basic.Namespace", "Basic.Type.Definition", "Basic.Type.Set"},Children or {})
+		self.Children = Map({"Basic.Namespace", "Basic.Type.Definition", "Basic.Type.Set"},Children)
 	end
 	self.Decompose = Namespace.Decompose
 	self.Copy = Namespace.Copy
@@ -22,9 +22,15 @@ Namespace.Initialize = function(_, self, Children, _Children)
 end;
 
 Namespace.Decompose = function(self) --into a Nested.Grammar
-	return 
-		Nested.Grammar(self.Children())
+	local NewGrammar = Nested.Grammar()
+	for Index = 1, self.Children.Entries:NumKeys() do
+		local Name, Entry = self.Children.Entries:GetPair(Index)
+		NewGrammar.Rules.Entries:Add(Name, Entry())
+	end
+	return NewGrammar 
+		--Nested.Grammar(self.Children())
 end;
+
 Namespace.Copy = function(self)
 	return Namespace(nil, self.Children:Copy())
 end;

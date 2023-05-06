@@ -8,14 +8,15 @@ local Canonical = OOP.Declarator.Shortcuts(
 	}
 )
 
+local Decompose = function(self)
+	return lpeg.V(self.Target)
+end;
 
 Canonical.Initialize = function(_, self, Target)
 	self.Target = Target
+	self.Decompose = Decompose
 end;
 
-Canonical.Decompose = function(self)
-	return lpeg.V(self.Target)
-end;
 
 Canonical.Copy = function(self)
 	return Canonical(self.Target)

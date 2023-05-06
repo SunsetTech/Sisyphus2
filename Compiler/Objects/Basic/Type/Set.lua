@@ -19,22 +19,23 @@ Set.Initialize = function(_, self, Children, _Children)
 	else
 		self.Children = Map({"Basic.Type.Definition", "Basic.Type.Set"}, Children or {})
 	end
+	self.Decompose = Set.Decompose
 end;
 
 Set.Decompose = function(self)
 	local Options = {}
 	
 	--for Name, _ in pairs(self.Children.Entries) do
+	local Grammar = Nested.Grammar()
 	for Index = 1, self.Children.Entries:NumKeys() do
-		local Name = self.Children.Entries:GetPair(Index)
+		local Name,Entry = self.Children.Entries:GetPair(Index)
+		Grammar.Rules.Entries:Add(Name, Entry())
 		table.insert(Options, Variable.Child(Name))
 	end
-	
+	Grammar.Rules.Entries:Add(1,PEG.Select(Options))
 	return 
-		Nested.Grammar{
-			PEG.Select(Options)
-		}
-		+ Nested.Grammar(self.Children())
+		Grammar
+		--+ Nested.Grammar(self.Children())
 end;
 
 Set.Copy = function(self)

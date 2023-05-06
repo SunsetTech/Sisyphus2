@@ -8,6 +8,7 @@ local All = OOP.Declarator.Shortcuts(
 
 function All:Initialize(Instance, InnerPattern)
 	Instance.InnerPattern = InnerPattern
+	Instance.Decompose = All.Decompose
 end
 
 function All:Decompose(Canonical)

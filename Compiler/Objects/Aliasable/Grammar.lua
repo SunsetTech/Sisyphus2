@@ -24,15 +24,17 @@ Grammar.Initialize = function(_, self, InitialPattern, AliasableTypes, BasicType
 	self.AliasableTypes = AliasableTypes or Aliasable.Namespace()
 	self.Syntax = Syntax or Nested.Grammar()
 	self.Information = Information or {}
+	self.Decompose = Grammar.Decompose
+	self.Copy = Grammar.Copy
 end;
 
 Grammar.Decompose = function(self)
+	local Namespace = Basic.Namespace()
+	Namespace.Children.Entries:Add("Aliasable", self.AliasableTypes())
+	Namespace.Children.Entries:Add("Basic", self.BasicTypes)
 	return Basic.Grammar(
 		self.InitialPattern,
-		Basic.Namespace{
-			Aliasable = self.AliasableTypes();
-			Basic = self.BasicTypes;
-		},
+		Namespace,
 		self.Syntax
 	)
 end;

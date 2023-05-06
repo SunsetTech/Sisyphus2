@@ -10,10 +10,9 @@ local Definition = OOP.Declarator.Shortcuts(
 )
 
 Definition.Initialize = function(_, self, Basetype, _Definition)
-	assert(Basetype)
-	assert(_Definition%"Aliasable.Type.Definition", "Expected Aliasable.Type.Definition")
 	self.Basetype = Basetype
 	self.Definition = _Definition
+	self.Decompose = Definition.Decompose
 end;
 
 Definition.Decompose = function(self)

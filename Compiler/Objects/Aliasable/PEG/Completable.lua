@@ -10,21 +10,24 @@ local Completable = OOP.Declarator.Shortcuts(
 	}
 )
 
-Completable.Initialize = function(_, self, Pattern, Function)
-	self.Pattern = -Pattern
-	self.Function = Function
-end;
-
-Completable.Decompose = function(self, Canonical)
+local Decompose = function(self, Canonical)
 	return Transform.Completable(
 		self.Pattern(Canonical), 
 		self.Function
 	)
+end; Completable.Decompose = Decompose;
+
+local Copy = function(self)
+	return Completable(-self.Pattern, self.Function)
+end; Completable.Copy = Copy;
+
+Completable.Initialize = function(_, self, Pattern, Function)
+	self.Pattern = Pattern
+	self.Function = Function
+	self.Decompose = Decompose
+	self.Copy = Copy
 end;
 
-Completable.Copy = function(self)
-	return Completable(self.Pattern, self.Function)
-end;
 
 return Completable
 

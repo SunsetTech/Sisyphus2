@@ -41,14 +41,14 @@ Map2.Decompose = function(self)
 		local Key, Entry = self.Entries:GetPair(Index)
 		local TypeCheck = false
 		--for _, Type in pairs(self.Types) do
-		for TypeIndex = 1, #self.Types do
+		--[[for TypeIndex = 1, #self.Types do
 			local Type = self.Types[TypeIndex]
 			if Entry%Type then
 				TypeCheck = true
 				break
 			end
 		end
-		assert(TypeCheck)
+		assert(TypeCheck)]]
 		Decomposed[Key] = Entry()
 	end
 

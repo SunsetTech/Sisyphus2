@@ -9,6 +9,7 @@ local Atleast = OOP.Declarator.Shortcuts(
 function Atleast:Initialize(Instance, Amount, InnerPattern)
 	Instance.Amount = Amount
 	Instance.InnerPattern = InnerPattern
+	Instance.Decompose = Atleast.Decompose
 end
 
 function Atleast:Decompose(Canonical)

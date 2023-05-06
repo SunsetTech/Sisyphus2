@@ -14,9 +14,11 @@ local Construct = Import.Module.Relative"Objects.Construct"
 local Incomplete = Import.Module.Relative"Objects.Incomplete"
 
 local function CreateNamespaceFor(Entry, Canonical)
-	local Namespace = Aliasable.Namespace{
+	local Namespace = Aliasable.Namespace()
+	Namespace.Children.Entries:Add(Canonical.Name, Entry)
+	--[[{
 		[Canonical.Name] = Entry;
-	}
+	}]]
 	
 	if Canonical.Namespace then
 		return CreateNamespaceFor(
@@ -71,8 +73,8 @@ return Template.Namespace{
 						local Namespace = CreateNamespaceFor(
 							Aliasable.Type.Definition(
 								Construct.ArgumentList{
-									Construct.AliasableType(InvertName(Specifier.Target)()),
-									Construct.AliasableType(InvertName(Specifier.Target)())
+									Construct.AliasableType(Specifier.Target(true)),
+									Construct.AliasableType(Specifier.Target(true))
 								},
 								function(LHS, RHS)
 									return LHS == RHS

@@ -12,39 +12,37 @@ local Static = Import.Module.Sister"Static"
 
 local Package
 
+local function JumpToGrammar(Subject, Position, Grammar, ...)
+	return Vlpeg.Match(
+		Vlpeg.Apply(
+			Vlpeg.Sequence(
+				Tools.Error.NotMine(Vlpeg.Table,Grammar), 
+				Vlpeg.Position()
+			),
+			function(Returns, Position)
+				return Position, table.unpack(Returns)
+			end
+		),
+		Subject, Position, ...
+	)
+end
+local function SetGrammar(NewGrammar, Environment)
+	--Tools.Error.CallerAssert(NewGrammar%"Aliasable.Grammar")
+	return 
+		NewGrammar/"userdata", {
+			Grammar = NewGrammar;
+			Variables = Tools.Table.Copy(Environment.Variables);
+		}
+end
 Package = {
 	DynamicParse = function(Pattern) --Matches Pattern which should produce an lpeg grammar/pattern and any number of arguments, then jumps to the returned grammar at the current position
-		return PEG.Immediate(
-			Pattern,
-			function(Subject, Position, Grammar, ...)
-				return Vlpeg.Match(
-					Vlpeg.Apply(
-						Vlpeg.Sequence(
-							Tools.Error.NotMine(Vlpeg.Table,Grammar), 
-							Vlpeg.Position()
-						),
-						function(Returns, Position)
-							return Position, table.unpack(Returns)
-						end
-					),
-					Subject, Position, ...
-				)
-			end
-		)
+		return PEG.Immediate(Pattern, JumpToGrammar)
 	end;
 	
 	ChangeGrammar = function(Pattern) --matches Pattern which should produce an Aliasable.Grammar, then return it and a copy of the current state to DynamicParse
 		return Package.DynamicParse(
 			PEG.Apply(
-				PEG.Sequence{Pattern, Static.GetEnvironment}, 
-				function(NewGrammar, Environment)
-					--Tools.Error.CallerAssert(NewGrammar%"Aliasable.Grammar")
-					return 
-						NewGrammar/"userdata", {
-							Grammar = NewGrammar;
-							Variables = Tools.Table.Copy(Environment.Variables);
-						}
-				end
+				PEG.Sequence{Pattern, Static.GetEnvironment}, SetGrammar
 			)
 		)
 	end;
@@ -63,8 +61,8 @@ Package = {
 	end;
 
 	Delimited = function(Open, Pattern, Close, Joiner)
-		Joiner = Joiner or Syntax.Tokens
-		return Joiner{Open, Pattern, Close}
+		--Joiner = Joiner or Syntax.Tokens
+		return (Joiner or Syntax.Tokens){Open, Pattern, Close}
 	end;
 
 	Quoted = function(Delimiter, Pattern)

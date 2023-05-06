@@ -22,12 +22,23 @@ Namespace.Initialize = function(_, self, Children, Base, _Children)
 	else
 		self.Children = Map({"Aliasable.Namespace", "Aliasable.Type.Definition"}, Children)
 	end
+	self.Decompose = Namespace.Decompose
+	self.Copy = Namespace.Copy
+	self.Merge = Namespace.Merge
 end;
 
 Namespace.Decompose = function(self) -- into a Basic.Namespace
-	return 
+	local Basics = Basic.Namespace()
+	for Index = 1, self.Children.Entries:NumKeys() do
+		local Name, Entry = self.Children.Entries:GetPair(Index)
+		Basics.Children.Entries:Add(Name, Entry())
+	end
+	local Base = self.Base:Copy()
+	Base:Merge(Basics)
+	return Base
+	--[[return 
 		self.Base
-		+ Basic.Namespace(self.Children())
+		+ Basic.Namespace(self.Children())]]
 end;
 
 Namespace.Copy = function(self)

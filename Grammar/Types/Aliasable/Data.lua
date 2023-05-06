@@ -11,9 +11,10 @@ local Variable = PEG.Variable
 local Construct = Import.Module.Relative"Objects.Construct"
 local Incomplete = Import.Module.Relative"Objects.Incomplete"
 local function CreateNamespaceFor(Entry, Canonical)
-	local Namespace = Aliasable.Namespace{
+	local Namespace = Aliasable.Namespace()--[[{
 		[Canonical.Name] = Entry;
-	}
+	}]]
+	Namespace.Children.Entries:Add(Canonical.Name, Entry)
 	
 	if Canonical.Namespace then
 		return CreateNamespaceFor(
@@ -34,6 +35,14 @@ local function InvertName(Canonical)
 	return Inverted
 end
 
+local function Box(...)
+	return {...}
+end
+
+local function PassThrough(...)
+	return ...
+end
+
 return Aliasable.Namespace {
 	Boolean = Aliasable.Type.Definition(
 		PEG.Select{
@@ -47,16 +56,14 @@ return Aliasable.Namespace {
 
 	String = Aliasable.Type.Definition(
 		Variable.Child"Syntax",
-		function(...)
-			return ...
-		end,
+		PassThrough,
 		Nested.Grammar{
 			Delimiter = PEG.Pattern'"';
 			Open = Variable.Sibling"Delimiter";
 			Close = Variable.Sibling"Delimiter";
 			Contents = PEG.Capture(
 				PEG.All(
-					require"Sisyphus_Old.Compiler.Objects.Nested.PEG.Dematch"(
+					require"Sisyphus2.Compiler.Objects.Nested.PEG.Dematch"(
 						PEG.Pattern(1),
 						Variable.Sibling"Delimiter"
 					)
@@ -80,16 +87,14 @@ return Aliasable.Namespace {
 					end
 					
 					
-					local InstanceName = CanonicalName(Canonical.Name .."<".. InvertName(Specifier.Target)() ..">", Canonical.Namespace)
+					local InstanceName = CanonicalName(Canonical.Name .."<".. Specifier.Target(true) ..">", Canonical.Namespace)
 					
 					local Namespace = CreateNamespaceFor(
 						Aliasable.Type.Definition(
 							Construct.ArgumentArray(
-								Construct.AliasableType(InvertName(Specifier.Target)())
+								Construct.AliasableType(Specifier.Target(true))
 							),
-							function(...)
-								return {...}
-							end
+							Box
 						),
 						InstanceName
 					)

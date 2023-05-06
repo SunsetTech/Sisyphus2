@@ -10,6 +10,7 @@ local Apply = OOP.Declarator.Shortcuts(
 function Apply:Initialize(Instance, Subpattern, Value)
 	Instance.Subpattern = Subpattern
 	Instance.Value = Value
+	Instance.Decompose = Apply.Decompose
 end
 
 function Apply:Decompose(Canonical)

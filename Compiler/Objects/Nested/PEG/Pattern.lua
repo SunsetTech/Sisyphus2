@@ -7,13 +7,15 @@ local Pattern = OOP.Declarator.Shortcuts(
 	}
 )
 
-Pattern.Initialize = function(_, self, P)
-	self.Pattern = P
-end;
-
-Pattern.Decompose = function(self, Canonical)
+Decompose = function(self, Canonical)
 	return lpeg.P(self.Pattern)
 end;
+
+Pattern.Initialize = function(_, self, P)
+	self.Pattern = P
+	self.Decompose = Decompose
+end;
+
 
 Pattern.Copy = function(self)
 	return Pattern(self.Pattern)

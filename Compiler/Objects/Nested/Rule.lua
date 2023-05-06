@@ -10,6 +10,7 @@ local Rule = OOP.Declarator.Shortcuts(
 function Rule:Initialize(Instance, Pattern)
 	assert(Pattern)
 	Instance.Pattern = Pattern
+	Instance.Decompose = Rule.Decompose
 end
 
 function Rule:Decompose(Canonical)

@@ -8,14 +8,15 @@ local Optional = OOP.Declarator.Shortcuts(
 	}
 )
 
+local Decompose = function(self, Canonical)
+	return self.InnerPattern(Canonical)^-1
+end;
+
 ---@param self Sisyphus2.Compiler.Objects.Nested.PEG.Optional
 Optional.Initialize = function(_, self, InnerPattern)
 	assert(type(InnerPattern) ~= "string")
 	self.InnerPattern = InnerPattern
-end;
-
-Optional.Decompose = function(self, Canonical)
-	return self.InnerPattern(Canonical)^-1
+	self.Decompose = Decompose
 end;
 
 Optional.Copy = function(self)

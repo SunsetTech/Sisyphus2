@@ -7,12 +7,13 @@ local Set = OOP.Declarator.Shortcuts(
 	}
 )
 
-Set.Initialize = function(_, self, Characters)
-	self.Characters = Characters
+local Decompose = function(self)
+	return Vlpeg.Set(self.Characters)
 end;
 
-Set.Decompose = function(self)
-	return Vlpeg.Set(self.Characters)
+Set.Initialize = function(_, self, Characters)
+	self.Characters = Characters
+	self.Decompose = Decompose
 end;
 
 Set.Copy = function(self)

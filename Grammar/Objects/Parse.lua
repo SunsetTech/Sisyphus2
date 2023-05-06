@@ -1,8 +1,8 @@
 local Tools = require"Toolbox.Tools"
 local Import = require"Toolbox.Import"
 
-local Vlpeg = require"Sisyphus.Vlpeg"
-local Compiler = require"Sisyphus.Compiler"
+local Vlpeg = require"Sisyphus2.Vlpeg"
+local Compiler = require"Sisyphus2.Compiler"
 local CanonicalName = Compiler.Objects.CanonicalName
 local PEG = Compiler.Objects.Nested.PEG
 local Variable = PEG.Variable

@@ -6,13 +6,7 @@ local Merger = OOP.Declarator.Shortcuts(
 	}
 )
 
-Merger.Initialize = function(_,self, Type, Items)
-	self.Type = Type
-	self.Items = Items
-end;
-
-
-Merger.Decompose = function(self)
+local Decompose = function(self)
 	local Merged
 	if (#self.Items >= 2) then
 		local First = self.Items[1]:Copy()
@@ -30,6 +24,13 @@ Merger.Decompose = function(self)
 	elseif (#self.Items == 1) then
 		return self.Items[1]
 	end
+end;
+
+
+Merger.Initialize = function(_,self, Type, Items)
+	self.Type = Type
+	self.Items = Items
+	self.Decompose = Decompose
 end;
 
 return Merger

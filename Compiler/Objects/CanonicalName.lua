@@ -9,18 +9,7 @@ local CanonicalName = OOP.Declarator.Shortcuts(
 	}
 )
 
----@param Instance Sisyphus2.Compiler.Objects.CanonicalName
----@param Name string
----@param Namespace Sisyphus2.Compiler.Objects.CanonicalName?
-function CanonicalName:Initialize(Instance, Name, Namespace)
-	Instance.Name = Name
-	Instance.Namespace = Namespace
-	self.Decompose = CanonicalName.Decompose
-	self.Copy = CanonicalName.Copy
-	self.Invert = CanonicalName.Invert
-end
-
-function CanonicalName:Decompose(Reverse)
+local function Decompose(self, Reverse)
 	return 
 		self.Namespace 
 		and (
@@ -31,11 +20,11 @@ function CanonicalName:Decompose(Reverse)
 		or self.Name
 end
 
-function CanonicalName:Copy()
+local function Copy(self)
 	return CanonicalName(self.Name, self.Namespace and self.Namespace:Copy() or nil)
 end
 
-function CanonicalName:Invert()
+local function Invert(self)
 	local At = self
 	local Inverted = CanonicalName(At.Name)
 	---@diagnostic disable-next-line:need-check-nil LLS is wrong here
@@ -45,6 +34,17 @@ function CanonicalName:Invert()
 		Inverted = CanonicalName(At.Name, Inverted)
 	end
 	return Inverted
+end
+
+---@param Instance Sisyphus2.Compiler.Objects.CanonicalName
+---@param Name string
+---@param Namespace Sisyphus2.Compiler.Objects.CanonicalName?
+function CanonicalName:Initialize(Instance, Name, Namespace)
+	Instance.Name = Name
+	Instance.Namespace = Namespace or false
+	Instance.Decompose = Decompose
+	Instance.Copy = Copy
+	Instance.Invert = Invert
 end
 
 return CanonicalName

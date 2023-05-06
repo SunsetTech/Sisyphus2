@@ -22,6 +22,11 @@ function TypeSpecifier.GetEnd(Specifier)
 	return Specifier.Namespace and TypeSpecifier.GetEnd(Specifier.Namespace) or Specifier
 end
 
+local function RestoreInitialPatternAndReturnSpecifier(Arguments)
+	Arguments.Grammar.InitialPattern=Arguments.Pattern
+	return Arguments.Specifier
+end
+
 function TypeSpecifier.GetCompleter(Specifier, Environment)
 	local Definition
 	if Environment.Using then
@@ -53,11 +58,8 @@ function TypeSpecifier.GetCompleter(Specifier, Environment)
 	elseif Definition%"Aliasable.Type.Definition" then
 		CurrentGrammar.InitialPattern = 
 			PEG.Apply(
-				PEG.Pattern(0),
-				function()
-					CurrentGrammar.InitialPattern = ResumePattern
-					return Specifier
-				end
+				PEG.Constant{Grammar=CurrentGrammar;Pattern=ResumePattern;Specifier=Specifier},
+				RestoreInitialPatternAndReturnSpecifier
 			)
 		
 	end

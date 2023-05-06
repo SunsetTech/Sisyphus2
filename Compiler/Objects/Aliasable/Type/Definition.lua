@@ -21,9 +21,17 @@ Definition.Initialize = function(_, self, Pattern, Function, Syntax, AliasableTy
 	self.AliasableTypes = AliasableTypes or Namespace()
 	self.BasicTypes = BasicTypes or Basic.Namespace()
 	self.Aliases = AliasList(Aliases)
+	self.Decompose = Definition.Decompose
+	self.Copy = Definition.Copy
 end;
 
 Definition.Decompose = function(self)
+	local Grammar = Nested.Grammar()
+	Grammar.Rules.Entries:Add("Aliases", self.Aliases())
+	Grammar:Merge(self.Syntax)
+	local Namespace = Basic.Namespace()
+	Namespace.Children.Entries:Add("Aliasable", self.AliasableTypes())
+	Namespace.Children.Entries:Add("Basic", self.BasicTypes)
 	return Basic.Type.Definition(
 		Nested.PEG.Select{ 
 			Completable(
@@ -31,16 +39,9 @@ Definition.Decompose = function(self)
 				self.Function
 			),
 			Nested.PEG.Variable.Child"Syntax.Aliases"
-		}, (
-			Nested.Grammar{
-				Aliases = self.Aliases();
-			}
-			+ self.Syntax
-		),
-		Basic.Namespace{
-			Aliasable = self.AliasableTypes();
-			Basic = self.BasicTypes;
-		}
+		}, 
+		Grammar,
+		Namespace
 	)
 end;
 
@@ -49,8 +50,6 @@ Definition.Copy = function(self)
 end;
 
 Definition.Merge = function(Into, From)
-	print("Not merging ".. tostring(Into) .." with ".. tostring(From))
-	print("TODO: fix this by dropping one of the duplicate types")
 end;
 
 return Definition

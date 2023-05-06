@@ -12,39 +12,47 @@ local Grammar = OOP.Declarator.Shortcuts(
 	}
 )
 
-function Grammar:Initialize(Instance, Rules, _Rules)
-	Instance.Rules = _Rules or OrderedMap(Rules)
-	self.Decompose = Grammar.Decompose
-	self.Copy = Grammar.Copy
-	self.SetRule = Grammar.SetRule
-	self.Merge = Grammar.Merge
-end;
-
-function Grammar:Decompose()
+---@param self Sisyphus2.Compiler.Objects.Flat.Grammar
+local function Decompose(self)
 	return lpeg.P(self.Rules.Pairs)
-end;
+end; Grammar.Decompose = Decompose
 
-function Grammar:Copy()
+---@param self Sisyphus2.Compiler.Objects.Flat.Grammar
+local function Copy(self)
 	local Rules = OrderedMap()
 	for Index = 1, self.Rules:NumKeys() do
 		local Name, Rule = self.Rules:GetPair(Index)
 		Rules:Add(Name, Rule)
 	end
-	local Copy = Grammar(nil, Rules)
-	return Copy
-end;
-		
-function Grammar:SetRule(Name, Rule)
-	self.Rules:Add(Name, Rule)
-end;
+	return Grammar(nil, Rules)
+end; Grammar.Copy = Copy
 
+---@param self Sisyphus2.Compiler.Objects.Flat.Grammar
+---@param Name string
+---@param Rule userdata
+local function SetRule(self, Name, Rule)
+	self.Rules:Add(Name, Rule)
+end; Grammar.SetRule = SetRule
+
+---@param self Sisyphus2.Compiler.Objects.Flat.Grammar
 ---@param From Sisyphus2.Compiler.Objects.Flat.Grammar
-function Grammar:Merge(From)
+local function Merge(self, From)
 	for Index = 1, From.Rules:NumKeys() do
 		local Name, Rule = From.Rules:GetPair(Index)
 		self.Rules:Add(Name, Rule)
 	end
-end
+end; Grammar.Merge = Merge
+
+---@param Instance Sisyphus2.Compiler.Objects.Flat.Grammar
+---@param Rules table<string,userdata>
+---@param _Rules Moonrise.Object.OrderedMap
+function Grammar:Initialize(Instance, Rules, _Rules)
+	Instance.Rules = _Rules or OrderedMap(Rules)
+	Instance.Decompose = Decompose
+	Instance.Copy = Copy
+	Instance.SetRule = SetRule
+	Instance.Merge = Merge
+end;
 
 return Grammar
 --[=[return Object(

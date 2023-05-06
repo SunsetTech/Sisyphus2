@@ -13,13 +13,13 @@ function Object:Copy() error"Not Implemented" end
 function Object:Merge(From) error"Not Implemented" end
 
 function Object:__call(...) --Decompose
-	local Decomposed = self:Decompose(...)
+	--local Decomposed = self:Decompose(...)
 
 	--[[if getmetatable(Decomposed) then --why was this here?
 		getmetatable(Decomposed).__source = self; --TODO preserve during copy
 	end]]
 	
-	return Decomposed
+	return self:Decompose(...)
 end;
 
 function Object:__unm() --Copy
@@ -30,7 +30,7 @@ function Object:__unm() --Copy
 end;
 
 function Object:__add(Additions) --Merge
-	--Tools.Debug.PrintCaller()	
+	--Tools.Debug.PrintCaller()
 	if type(Additions) ~= "table" then
 		Additions = {Additions}
 	end
@@ -44,8 +44,8 @@ function Object:__add(Additions) --Merge
 	return Into
 end;
 
-local Counts = {}
 local Cache = {}
+local QueryCache = {}
 function Object:__mod(TypeQuery) --Typename lookup
 	local Typename = OOP.Reflection.Type.Name(self)
 	local TypeParts = Cache[Typename]
@@ -59,8 +59,11 @@ function Object:__mod(TypeQuery) --Typename lookup
 		end
 		Cache[Typename] = TypeParts
 	end
-	
-	local QueryParts = Tools.String.Explode(TypeQuery, ".")
+	local QueryParts = QueryCache[TypeQuery]
+	if not QueryParts then
+		QueryParts = Tools.String.Explode(TypeQuery, ".")
+		QueryCache[TypeQuery] = QueryParts
+	end
 	local RootType = QueryParts[1]
 	local SubTypes = Tools.Array.Slice(QueryParts,2)
 	local RootIndex = TypeParts[RootType]

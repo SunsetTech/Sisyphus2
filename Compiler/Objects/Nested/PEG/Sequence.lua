@@ -9,15 +9,17 @@ local Sequence = OOP.Declarator.Shortcuts(
 	}
 )
 
+local Decompose = function(self, Canonical)
+	local Patterns = self.Parts(Canonical)
+	return Vlpeg.Sequence(table.unpack(Patterns))
+end;
+
+
 Sequence.Initialize = function(_, self, Parts, _Parts)
 	self.Parts = _Parts or Array("Nested.PEG", Parts)
 	self.Decompose = Sequence.Decompose
 	self.Copy = Sequence.Copy
-end;
-
-Sequence.Decompose = function(self, Canonical)
-	local Patterns = self.Parts(Canonical)
-	return Vlpeg.Sequence(table.unpack(Patterns))
+	self.Decompose = Decompose
 end;
 
 Sequence.Copy = function(self)

@@ -9,11 +9,10 @@ Dematch.Initialize = function(_, Instance, Pattern, Without)
 	assert(Pattern and Without)
 	Instance.Pattern = Pattern
 	Instance.Without = Without
-	print(Instance,Pattern,Without)
+	Instance.Decompose = Dematch.Decompose
 end;
 
 Dematch.Decompose = function(self, Canonical)
-	print(self,self.Pattern,self.Without)
 	return self.Pattern(Canonical) - self.Without(Canonical)
 end;
 

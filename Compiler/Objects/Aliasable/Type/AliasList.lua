@@ -12,6 +12,7 @@ local AliasList = OOP.Declarator.Shortcuts(
 
 AliasList.Initialize = function(_, self, Names)
 	self.Names = Names or {}
+	self.Decompose = AliasList.Decompose
 	--[[for Index, _ in pairs(self.Names) do
 		Tools.Error.CallerAssert(type(Index) == "number", "hmm")
 	end]]

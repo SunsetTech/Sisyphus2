@@ -12,6 +12,7 @@ local Capture = OOP.Declarator.Shortcuts(
 ---@param Instance Sisyphus2.Compiler.Objects.Nested.PEG.Capture
 function Capture:Initialize(Instance, SubPattern)
 	Instance.SubPattern = SubPattern
+	Instance.Decompose = Capture.Decompose
 end
 
 function Capture:Decompose(Canonical)
