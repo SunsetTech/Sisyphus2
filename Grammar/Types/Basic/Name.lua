@@ -1,16 +1,14 @@
 local Import = require"Toolbox.Import"
 
-local Compiler = require"Sisyphus2.Compiler"
-local Basic = Compiler.Objects.Basic
-local Nested = Compiler.Objects.Nested
+local Structure = require"Sisyphus2.Structure"
+local Basic = Structure.Basic
+local Nested = Structure.Nested
 local PEG = Nested.PEG
 local Variable = PEG.Variable
 
-local Syntax = Import.Module.Relative"Objects.Syntax"
-local Construct = Import.Module.Relative"Objects.Construct"
-local Static = Import.Module.Relative"Objects.Static"
+local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
+local Static = require"Sisyphus2.Interpreter.Objects.Static"
 
-local Vlpeg = require"Sisyphus2.Vlpeg"
 
 return Basic.Namespace{
 	Part = Basic.Type.Definition(
@@ -26,8 +24,11 @@ return Basic.Namespace{
 			Variable.Canonical"Types.Basic.Name.Specifier",
 			function(...)
 				local Canonical
-				for _, Part in pairs{...} do
-					Canonical = Compiler.Objects.CanonicalName(Part, Canonical)
+				local Parts = {...}
+				--for _, Part in pairs{...} do
+				for Index = 1, #Parts do
+					local Part = Parts[Index]
+					Canonical = Structure.CanonicalName(Part, Canonical)
 				end
 				return Canonical
 			end
@@ -39,11 +40,11 @@ return Basic.Namespace{
 			Variable.Canonical"Types.Basic.Name.Specifier",
 			function(...)
 				local Parts = {...}
-				local Root = Compiler.Objects.CanonicalName(Parts[1])
+				local Root = Structure.CanonicalName(Parts[1])
 				local Target = Root
 				for Index = 2, #Parts do -- 1,2,3 {1,{2,{3}}}
 					local Part = Parts[Index]
-					Target.Namespace = Compiler.Objects.CanonicalName(Parts[Index])
+					Target.Namespace = Structure.CanonicalName(Parts[Index])
 					Target = Target.Namespace
 				end
 				return Root

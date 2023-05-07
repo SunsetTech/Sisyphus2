@@ -1,11 +1,11 @@
 local Import = require"Toolbox.Import"
 local Tools = require"Toolbox.Tools"
 
-local Compiler = require"Sisyphus2.Compiler"
+local Structure = require"Sisyphus2.Structure"
 
-local Basic = Compiler.Objects.Basic
+local Basic = Structure.Objects.Basic
 
-local PEG = require"Sisyphus2.Compiler.Objects.Nested.PEG"
+local PEG = require"Sisyphus2.Structure.Objects.Nested.PEG"
 local Variable = PEG.Variable
 
 local Objects = Import.Module.Relative"Objects"

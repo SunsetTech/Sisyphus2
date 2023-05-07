@@ -4,15 +4,14 @@ local Tools = require"Moonrise.Tools"
 local Import = require"Moonrise.Import"
 
 local Vlpeg = require"Sisyphus2.Vlpeg"
-local Compiler = require"Sisyphus2.Compiler"
-local Template = Compiler.Objects.Template
-local Aliasable = Compiler.Objects.Aliasable
-local Basic = Compiler.Objects.Basic
-local PEG = Compiler.Objects.Nested.PEG
+local Structure = require"Sisyphus2.Structure"
+local Template = Structure.Template
+local Aliasable = Structure.Aliasable
+local Basic = Structure.Basic
+local PEG = Structure.Nested.PEG
 local Variable = PEG.Variable
 
-local Syntax = Import.Module.Relative"Objects.Syntax"
-local Construct = Import.Module.Relative"Objects.Construct"
+local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 
 return Basic.Type.Set{
 	Modifier = Basic.Type.Set{
@@ -135,7 +134,9 @@ return Basic.Type.Set{
 					local Namespace = Template.Namespace()
 					local GeneratedTypes = Aliasable.Namespace()
 
-					for _, Declaration in pairs(Declarations) do
+					--for _, Declaration in pairs(Declarations) do
+					for Index = 1, #Declarations do
+						local Declaration = Declarations[Index]
 						--Namespace = Namespace + Declaration.Namespace
 						Namespace:Merge(Declaration.Namespace)
 						if Declaration.GeneratedTypes then

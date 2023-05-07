@@ -1,15 +1,15 @@
 local Tools = require"Toolbox.Tools"
-local PEG = require"Sisyphus2.Compiler.Objects.Nested.PEG"
+local PEG = require"Sisyphus2.Structure.Nested.PEG"
 
 local TypeSpecifier = {}
 
----@param Namespace Sisyphus2.Compiler.Objects.Aliasable.Namespace
----@param Specifier Sisyphus2.Compiler.Objects.CanonicalName
----@return Sisyphus2.Compiler.Objects.Aliasable.Namespace?
+---@param Namespace Sisyphus2.Structure.Aliasable.Namespace
+---@param Specifier Sisyphus2.Structure.CanonicalName
+---@return Sisyphus2.Structure.Aliasable.Namespace?
 TypeSpecifier.Lookup = function(Namespace, Specifier)
 	local Result = Namespace.Children.Entries:Get(Specifier.Name)
 	if Result == nil then return end
-	---@cast Result Sisyphus2.Compiler.Objects.Aliasable.Namespace
+	---@cast Result Sisyphus2.Structure.Aliasable.Namespace
 	--assert(Result ~= nil, "Couldn't find ".. Specifier())
 	if Specifier.Namespace then assert(Result%"Aliasable.Namespace") end
 	return 

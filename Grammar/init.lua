@@ -1,13 +1,13 @@
 local Module = require"Moonrise.Import.Module"
 
 local Vlpeg = require"Sisyphus2.Vlpeg"
-local Compiler = require"Sisyphus2.Compiler"
-local PEG = Compiler.Objects.Nested.PEG
+local Structure = require"Sisyphus2.Structure"
+local PEG = Structure.Nested.PEG
 local Variable = PEG.Variable
-local Template = Compiler.Objects.Template
-local Aliasable = Compiler.Objects.Aliasable
+local Template = Structure.Template
+local Aliasable = Structure.Aliasable
 local AliasableTypes = Module.Child"Types.Aliasable"
-local Construct = Module.Child"Objects.Construct"
+local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 
 local AliasableGrammar = Aliasable.Grammar( 
 	PEG.Table(

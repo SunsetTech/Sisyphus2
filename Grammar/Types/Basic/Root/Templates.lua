@@ -1,15 +1,15 @@
 local Import = require"Toolbox.Import"
 
-local Compiler = require"Sisyphus2.Compiler"
-local Aliasable = Compiler.Objects.Aliasable
-local Basic = Compiler.Objects.Basic
-local Nested = Compiler.Objects.Nested
+local Structure = require"Sisyphus2.Structure"
+local Aliasable = Structure.Aliasable
+local Basic = Structure.Basic
+local Nested = Structure.Nested
 local PEG = Nested.PEG
 local Variable = PEG.Variable
 
-local Construct = Import.Module.Relative"Objects.Construct"
-local Syntax = Import.Module.Relative"Objects.Syntax"
-local Static = Import.Module.Relative"Objects.Static"
+local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
+local Syntax = require"Sisyphus2.Interpreter.Objects.Syntax"
+local Static = require"Sisyphus2.Interpreter.Objects.Static"
 
 return Basic.Type.Set{
 	If = Basic.Type.Definition(

@@ -1,15 +1,15 @@
 local Import = require"Moonrise.Import"
 
-local Compiler = require"Sisyphus2.Compiler"
+local Structure = require"Sisyphus2.Structure"
 
-local CanonicalName = Compiler.Objects.CanonicalName
-local Aliasable = Compiler.Objects.Aliasable
-local Nested = Compiler.Objects.Nested
+local CanonicalName = Structure.CanonicalName
+local Aliasable = Structure.Aliasable
+local Nested = Structure.Nested
 local PEG = Nested.PEG
 local Variable = PEG.Variable
 
-local Construct = Import.Module.Relative"Objects.Construct"
-local Incomplete = Import.Module.Relative"Objects.Incomplete"
+local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
+local Incomplete = require"Sisyphus2.Interpreter.Objects.Incomplete"
 local function CreateNamespaceFor(Entry, Canonical)
 	local Namespace = Aliasable.Namespace()--[[{
 		[Canonical.Name] = Entry;
@@ -27,10 +27,10 @@ local function CreateNamespaceFor(Entry, Canonical)
 end
 
 local function InvertName(Canonical)
-	local Inverted = Compiler.Objects.CanonicalName(Canonical.Name)
+	local Inverted = Structure.CanonicalName(Canonical.Name)
 	while(Canonical.Namespace) do
 		Canonical = Canonical.Namespace
-		Inverted = Compiler.Objects.CanonicalName(Canonical.Name, Inverted)
+		Inverted = Structure.CanonicalName(Canonical.Name, Inverted)
 	end
 	return Inverted
 end
@@ -63,7 +63,7 @@ return Aliasable.Namespace {
 			Close = Variable.Sibling"Delimiter";
 			Contents = PEG.Capture(
 				PEG.All(
-					require"Sisyphus2.Compiler.Objects.Nested.PEG.Dematch"(
+					require"Sisyphus2.Structure.Nested.PEG.Dematch"(
 						PEG.Pattern(1),
 						Variable.Sibling"Delimiter"
 					)

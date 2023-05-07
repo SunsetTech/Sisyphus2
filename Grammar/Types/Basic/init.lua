@@ -1,12 +1,11 @@
 local Module = require"Moonrise.Import.Module"
 
-local Compiler = require"Sisyphus2.Compiler"
-local Basic = Compiler.Objects.Basic
-local PEG = Compiler.Objects.Nested.PEG
+local Structure = require"Sisyphus2.Structure"
+local Basic = Structure.Basic
+local PEG = Structure.Nested.PEG
 local Variable = PEG.Variable
 
-local Syntax = Module.Relative"Objects.Syntax"
-local Construct = Module.Relative"Objects.Construct"
+local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 
 return Basic.Namespace{
 	Name = Module.Child"Name";

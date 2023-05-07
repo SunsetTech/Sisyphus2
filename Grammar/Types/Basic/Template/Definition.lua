@@ -1,18 +1,18 @@
 local Import = require"Toolbox.Import"
 
-local Compiler = require"Sisyphus2.Compiler"
-local CanonicalName = Compiler.Objects.CanonicalName
+local Structure = require"Sisyphus2.Structure"
 
-local Aliasable = Compiler.Objects.Aliasable
-local Template = Compiler.Objects.Template
+local Aliasable = Structure.Aliasable
+local Template = Structure.Template
 
-local PEG = require"Sisyphus2.Compiler.Objects.Nested.PEG"
+local PEG = require"Sisyphus2.Structure.Nested.PEG"
 
-local Objects = Import.Module.Relative"Objects"
+local Objects = require"Sisyphus2.Interpreter.Objects"
 local Syntax = Objects.Syntax
 local Static = Objects.Static
 local Parse = Objects.Construct
-local Generate = require"Sisyphus2.Grammar.Generate"
+local Generate = require"Sisyphus2.Interpreter.Generate"
+local Execution = require"Sisyphus2.Interpreter.Execution"
 
 local Definition = {}
 
@@ -20,7 +20,9 @@ local Definition = {}
 function Definition.Arguments(Parameters)
 	local ArgumentPatterns = {}
 
-	for Index, Parameter in pairs(Parameters) do
+	--for Index, Parameter in pairs(Parameters) do
+	for Index = 1, #Parameters do
+		local Parameter = Parameters[Index]
 		ArgumentPatterns[Index] = Parse.AliasableType(Parameter.Specifier.Target:Invert()())
 	end
 
@@ -82,7 +84,7 @@ end
 ---fuck how do we even annotate this
 ---@param ... any
 function Definition.Return(...) -- I forget why this was necessary
-	return Compiler.Transform.Incomplete(
+	return Execution.Incomplete(
 		{...},
 		function(...)
 			return ...
@@ -94,7 +96,9 @@ function Definition.GenerateVariables(Parameters)
 	local Variables = Template.Namespace()
 	local GeneratedTypes = Aliasable.Namespace()
 
-	for Index, Parameter in pairs(Parameters) do
+	--for Index, Parameter in pairs(Parameters) do
+	for Index = 1, #Parameters do
+		local Parameter = Parameters[Index]
 		if Parameter.Specifier.GeneratedTypes then
 			GeneratedTypes = GeneratedTypes + Parameter.Specifier.GeneratedTypes
 		end
@@ -129,7 +133,7 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 		),
 		VariablesNamespace + Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)(
 			function(...) 
-				return Compiler.Transform.Resolvable(
+				return Execution.Resolvable(
 					function(Environment)
 						return Environment.Body(Environment)
 					end

@@ -1,21 +1,17 @@
 local Import = require"Toolbox.Import"
 local Tools = require"Toolbox.Tools"
 
-local Compiler = require"Sisyphus2.Compiler"
-local Lookup = Compiler.Lookup
-local Basic = Compiler.Objects.Basic
-local Nested = Compiler.Objects.Nested
+local Structure = require"Sisyphus2.Structure"
+local Basic = Structure.Basic
+local Nested = Structure.Nested
 local PEG = Nested.PEG
-local Variable = PEG.Variable
 
 local Objects = Import.Module.Relative"Objects"
-local Syntax = Objects.Syntax
 local Parse = Objects.Parse
 local Static = Objects.Static
 
-local Generate = Import.Module.Relative"Generate"
+local Generate = require"Sisyphus2.Interpreter.Generate"
 
-local Vlpeg = require"Sisyphus2.Vlpeg"
 
 return Basic.Namespace{
 	Name = Basic.Namespace{
@@ -31,9 +27,12 @@ return Basic.Namespace{
 			PEG.Apply(
 				Parse.Basic"Type.Name.Full",
 				function(...)
+					local Parts = {...}
 					local Canonical
-					for _, Part in pairs{...} do
-						Canonical = Compiler.Objects.CanonicalName(Part, Canonical)
+					--for _, Part in pairs{...} do
+					for Index = 1, #Parts do
+						local Part = Parts[Index]
+						Canonical = Structure.CanonicalName(Part, Canonical)
 					end
 					--print("GENERATED", Canonical())
 					return Canonical

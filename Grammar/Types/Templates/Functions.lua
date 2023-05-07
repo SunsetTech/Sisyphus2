@@ -1,17 +1,17 @@
 local Import = require"Toolbox.Import"
 
-local Compiler = require"Sisyphus2.Compiler"
-local CanonicalName = Compiler.Objects.CanonicalName
-local Aliasable = Compiler.Objects.Aliasable
-local Template = Compiler.Objects.Template
-local Nested = Compiler.Objects.Nested
+local Structure = require"Sisyphus2.Structure"
+local CanonicalName = Structure.CanonicalName
+local Aliasable = Structure.Aliasable
+local Template = Structure.Template
+local Nested = Structure.Nested
 local PEG = Nested.PEG
 local Variable = PEG.Variable
 
-local Syntax = Import.Module.Relative"Objects.Syntax"
-local Construct = Import.Module.Relative"Objects.Construct"
+local Syntax = require"Sisyphus2.Interpreter.Objects.Syntax"
+local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 
-local Incomplete = Import.Module.Relative"Objects.Incomplete"
+local Incomplete = require"Sisyphus2.Interpreter.Objects.Incomplete"
 
 local function CreateNamespaceFor(Entry, Canonical)
 	local Namespace = Aliasable.Namespace()
@@ -31,10 +31,10 @@ local function CreateNamespaceFor(Entry, Canonical)
 end
 
 local function InvertName(Canonical)
-	local Inverted = Compiler.Objects.CanonicalName(Canonical.Name)
+	local Inverted = Structure.CanonicalName(Canonical.Name)
 	while(Canonical.Namespace) do
 		Canonical = Canonical.Namespace
-		Inverted = Compiler.Objects.CanonicalName(Canonical.Name, Inverted)
+		Inverted = Structure.CanonicalName(Canonical.Name, Inverted)
 	end
 	return Inverted
 end

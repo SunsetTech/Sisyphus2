@@ -1,7 +1,7 @@
 local Module = require"Moonrise.Import.Module"
 
-local Compiler = require"Sisyphus2.Compiler"
+local Structure = require"Sisyphus2.Structure"
 
-return Compiler.Objects.Aliasable.Namespace{
+return Structure.Aliasable.Namespace{
 	Data = Module.Child"Data";
 }

@@ -13,7 +13,7 @@ DebugOutput.IncludeSource = false
 DebugOutput.Enabled = false]]
 
 local Vlpeg = require"Sisyphus2.Vlpeg"
-local Compiler = require"Sisyphus2.Compiler"
+local Structure = require"Sisyphus2.Structure"
 
 local TemplateGrammar = require"Sisyphus2.Grammar"
 local AliasableGrammar = TemplateGrammar()
@@ -41,7 +41,7 @@ print"_____"
 print(Output)
 print(collectgarbage("count")/1024)
 print(getTime()-StartTime .."s")
---[[for Name, Amount in pairs(Compiler.Object.TotalCopies) do
+--[[for Name, Amount in pairs(Structure.Object.TotalCopies) do
 	--print(Amount .." ".. Name .." copies created")
 end]]
 
