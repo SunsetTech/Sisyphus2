@@ -23,7 +23,7 @@ end;
 Grammar.Decompose = function(self)
 	local Nested = Nested.Grammar()
 	Nested.Rules.Entries:Add(1, self.InitialPattern)
-	Nested.Rules.Entries:Add("Types", self.Types())
+	Nested.Rules.Entries:Add("Types", self.Types:Decompose())
 	Nested.Rules.Entries:Add("Syntax", self.Syntax)
 	return Nested
 	--[[{

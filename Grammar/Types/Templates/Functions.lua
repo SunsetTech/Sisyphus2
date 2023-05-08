@@ -39,6 +39,32 @@ local function InvertName(Canonical)
 	return Inverted
 end
 
+local function GenerateEqualType(Canonical, Specifier) -- Generate the match Specifier and the Added Types
+	local GeneratedTypes = Aliasable.Namespace()
+
+	if Specifier.GeneratedTypes then
+		GeneratedTypes = GeneratedTypes + Specifier.GeneratedTypes
+	end
+	
+	
+	local InstanceName = CanonicalName(Canonical.Name .."<".. Specifier.Target:Decompose(true) ..">", Canonical.Namespace)
+	local Namespace = CreateNamespaceFor(
+		Aliasable.Type.Definition(
+			Construct.ArgumentList{
+				Construct.AliasableType(Specifier.Target:Decompose(true)),
+				Construct.AliasableType(Specifier.Target:Decompose(true))
+			},
+			function(LHS, RHS)
+				return LHS == RHS
+			end
+		),
+		InstanceName
+	)
+	return 
+		InstanceName:Invert(),
+		GeneratedTypes
+		+ Namespace
+end
 return Template.Namespace{
 	Join = Template.Definition(
 		CanonicalName("Data", CanonicalName"String"),
@@ -47,9 +73,7 @@ return Template.Namespace{
 				PEG.Optional(PEG.Pattern"Join"), 
 				Construct.AliasableType"Data.Array<Data.String>"
 			},
-			function(Arguments)
-				return table.concat(Arguments)
-			end
+			table.concat
 		)
 	);
 
@@ -59,35 +83,11 @@ return Template.Namespace{
 			PEG.Pattern"Equals",
 			function(Canonical)--Equals<TypeSpecifier>
 				Canonical = InvertName(Canonical)
-				return PEG.Apply(
-					Construct.ArgumentList{Variable.Canonical"Types.Basic.Template.TypeSpecifier"},
-					function(Specifier) -- Generate the match Specifier and the Added Types
-						local GeneratedTypes = Aliasable.Namespace()
-
-						if Specifier.GeneratedTypes then
-							GeneratedTypes = GeneratedTypes + Specifier.GeneratedTypes
-						end
-						
-						
-						local InstanceName = CanonicalName(Canonical.Name .."<".. InvertName(Specifier.Target)() ..">", Canonical.Namespace)
-						local Namespace = CreateNamespaceFor(
-							Aliasable.Type.Definition(
-								Construct.ArgumentList{
-									Construct.AliasableType(Specifier.Target(true)),
-									Construct.AliasableType(Specifier.Target(true))
-								},
-								function(LHS, RHS)
-									return LHS == RHS
-								end
-							),
-							InstanceName
-						)
-						return 
-							InvertName(InstanceName),
-							GeneratedTypes
-							+ Namespace
-					end
+				local New = PEG.Apply(
+					PEG.Sequence{PEG.Constant(Canonical), Construct.ArgumentList{Variable.Canonical"Types.Basic.Template.TypeSpecifier"}},
+					GenerateEqualType
 				)
+				return New
 			end
 		)
 	);

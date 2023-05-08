@@ -18,15 +18,18 @@ function Object:__call(...) --Decompose
 	--[[if getmetatable(Decomposed) then --why was this here?
 		getmetatable(Decomposed).__source = self; --TODO preserve during copy
 	end]]
-	
-	return self:Decompose(...)
+	error"Don't use"
+	local Decomposed = self:Decompose(...)
+	return Decomposed
 end;
 
 function Object:__unm() --Copy
-	--Tools.Debug.PrintCaller()
+	Tools.Debug.PrintCaller()
+	error"Dont use"
 	--local New = self:Copy()
 	--assert(OOP.Reflection.Type.Of(getmetatable(self), New))
-	return self:Copy()
+	local New = self:Copy()
+	return New
 end;
 
 function Object:__add(Additions) --Merge
@@ -36,7 +39,8 @@ function Object:__add(Additions) --Merge
 	end
 
 	local Into = self:Copy()
-	for Index = 1, #Additions do
+	local Count = #Additions
+	for Index = 1, Count do
 		local Addition = Additions[Index]	
 		Into:Merge(Addition)
 	end
@@ -81,14 +85,10 @@ function Object:__mod(TypeQuery) --Typename lookup
 	return true
 end;
 
-local function GetType(Of)
-	return OOP.Reflection.Type.Name(Of)
-end
-
 function Object:__div(Type) -- /"Type" Iteratively decomposes until it's of Type
 	local Decomposed = self
 	while not OOP.Reflection.Type.Name(Decomposed):match(Type .."$") do
-		Decomposed = Decomposed()
+		Decomposed = Decomposed:Decompose()
 	end
 	return Decomposed
 end;
@@ -107,43 +107,3 @@ function Object:ToString()
 end
 
 return Object
---[[local function NewInstance(self, ...)
-	local Data = {}
-	self.__definition.Construct(Data, ...)
-	local Instance = setmetatable(Data, self)
-	return Instance
-end]]
-
---[[return setmetatable(
-	{
-		TotalCopies = {}
-	},{
-		__call = function(Class, Typename, Definition)
-			local TypeParts = {}
-
-			for Index, SubType in pairs(Tools.String.Explode(Typename, ".")) do
-				TypeParts[SubType] = Index
-				TypeParts[Index] = SubType
-			end
-			
-			local MT = {
-				__type = "Sisyphus.Structure.Object";
-				__typename = Typename;
-				__typeparts = TypeParts;
-				__definition = Definition;
-				__class = Class;
-				__new = NewInstance;
-				__call = __call;
-				__unm = __unm;
-				__add = __add;
-				__mod = __mod;
-				__div = __div;
-				__tostring = __tostring;
-				__index = function(t,k) if (Definition.DumpIndex) then Definition.DumpIndex(t,k) end return Definition[k] end;
-			}
-			return function(...)
-				return MT:__new(...)
-			end
-		end
-	}
-)]]

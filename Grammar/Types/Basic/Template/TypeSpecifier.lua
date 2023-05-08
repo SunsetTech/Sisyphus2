@@ -19,12 +19,18 @@ TypeSpecifier.Lookup = function(Namespace, Specifier)
 end
 
 function TypeSpecifier.GetEnd(Specifier)
-	return Specifier.Namespace and TypeSpecifier.GetEnd(Specifier.Namespace) or Specifier
+	local End = Specifier.Namespace and TypeSpecifier.GetEnd(Specifier.Namespace) or Specifier
+	return End
 end
 
 local function RestoreInitialPatternAndReturnSpecifier(Arguments)
 	Arguments.Grammar.InitialPattern=Arguments.Pattern
 	return Arguments.Specifier
+end
+
+local function RestoreInitialPatternAndReturnAll(Arguments, ...)
+	Arguments.Grammar.InitialPattern = Arguments.Pattern
+	return ...
 end
 
 function TypeSpecifier.GetCompleter(Specifier, Environment)
@@ -49,11 +55,8 @@ function TypeSpecifier.GetCompleter(Specifier, Environment)
 	
 	if Definition%"Aliasable.Type.Definition.Incomplete" then
 		CurrentGrammar.InitialPattern = PEG.Apply(
-			Definition.Complete(Specifier),
-			function(...)
-				CurrentGrammar.InitialPattern = ResumePattern
-				return ...
-			end
+			PEG.Sequence{PEG.Constant{Grammar = CurrentGrammar, Pattern = ResumePattern},Definition.Complete(Specifier)},
+			RestoreInitialPatternAndReturnAll
 		)
 	elseif Definition%"Aliasable.Type.Definition" then
 		CurrentGrammar.InitialPattern = 

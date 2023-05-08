@@ -18,11 +18,13 @@ List.Initialize = function(_, self, Patterns, Seperator)
 end;
 
 List.Decompose = function(self, Canonical)
-	return Pattern.Syntax.Concatenate(self.Seperator(Canonical), table.unpack(self.Patterns(Canonical)))
+	local Decomposed = Pattern.Syntax.Concatenate(self.Seperator:Decompose(Canonical), table.unpack(self.Patterns:Decompose(Canonical)))
+	return Decomposed
 end;
 
 List.Copy = function(self)
-	return List((-self.Patterns).Items, -self.Seperator)
+	local New = List(self.Patterns:Copy().Items, self.Seperator:Copy())
+	return New
 end;
 
 List.ToString = function(self)

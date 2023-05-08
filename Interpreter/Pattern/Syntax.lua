@@ -7,25 +7,28 @@ local Static = Import.Module.Sister"Static"
 local Package = {}
 
 Package = {
-	Concatenate = function(Seperator, First, Next, ...)
-		return (Next
+	Concatenate = function(Seperator, First, ...)
+		local Rest = {...}
+		local Parts = {First}
+		for Index = 1, #Rest do
+			table.insert(Parts, Seperator)
+			table.insert(Parts, Rest[Index])
+		end
+		local New = Vlpeg.Sequence(table.unpack(Parts))
+		--[[local New = (Next
 			and Package.Concatenate(
 				Seperator, 
 				Vlpeg.Sequence(First, Seperator, Next), ...
 			)
 			or First
-		)
+		)]]
+		return New
 	end;
 
 	Tokens = function(...)
-		return Package.Concatenate(Static.Whitespace^0, ...)
+		local New = Package.Concatenate(Static.Whitespace^0, ...)
+		return New
 	end;
-
-	--[[Array = function(Pattern, Seperator, Joiner) --Unused
-		error"?"
-		Joiner = Joiner or Package.Tokens
-		return Joiner(Pattern,Joiner(Seperator, Pattern)^0)
-	end;]]
 }
 
 return Package

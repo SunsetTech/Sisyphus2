@@ -10,12 +10,11 @@ local Template = {
 local function LookupAliasableType(In, Canonical)
 	if Canonical then
 		if In%"Aliasable.Namespace" then
-			return LookupAliasableType(In.Children.Entries:Get(Canonical.Name), Canonical.Namespace)
+			local Found = LookupAliasableType(In.Children.Entries:Get(Canonical.Name), Canonical.Namespace)
+			return Found
 		else
-			Tools.Error.CallerError(Tools.String.Format"Can't lookup %s in %s"(Canonical.Name, In))
 		end
 	else
-		Tools.Error.CallerAssert(In and In%"Aliasable.Type.Definition", "Didnt find an aliasable type, got ".. tostring(In))
 		return In
 	end
 end
@@ -28,7 +27,7 @@ local function RegisterTemplates(AliasableTypes, Templates, Canonical)
 			RegisterTemplates(AliasableTypes, Entry, CanonicalName(Name, Canonical))
 		elseif Entry%"Template.Definition" then
 			local AliasableType = LookupAliasableType(AliasableTypes, Entry.Basetype)
-			table.insert(AliasableType.Aliases.Names, CanonicalName(Name, Canonical)())
+			table.insert(AliasableType.Aliases.Names, CanonicalName(Name, Canonical):Decompose())
 		end
 	end
 	return 
@@ -68,7 +67,7 @@ Grammar.Decompose = function(self) --Decomposes into an Aliasable.Grammar
 		Aliasable.Namespace()
 		+ {
 			(Copy.AliasableTypes.Children.Entries:Get"Templates" or Aliasable.Namespace()),
-			self.Templates()
+			self.Templates:Decompose()
 		}
 	)
 	

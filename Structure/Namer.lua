@@ -10,6 +10,8 @@ local Namer = OOP.Declarator.Shortcuts(
 	}
 )
 
+local Add, NumKeys, GetPair = OrderedMap.Add, OrderedMap.NumKeys, OrderedMap.GetPair
+
 local Add = function(self, Key, Value)
 	--self.Entries[Key] = Value
 	self.Entries:Add(Key, Value)
@@ -19,8 +21,8 @@ local Decompose = function(self, Canonical)
 	local NamedEntries = {}
 
 	--for Name, Entry in pairs(self.Entries) do
-	for NameIndex = 1, self.Entries:NumKeys() do 
-		local Name, Entry = self.Entries:GetPair(NameIndex)
+	for NameIndex = 1, NumKeys(self.Entries) do 
+		local Name, Entry = GetPair(self.Entries, NameIndex)
 		local TypeCheck = false
 		
 		--[[for TypeIndex = 1,#self.Types do
@@ -40,7 +42,7 @@ local Decompose = function(self, Canonical)
 		
 		table.insert(
 			NamedEntries,
-			Entry(Fullname)
+			Entry:Decompose(Fullname)
 		)
 	end
 	
@@ -50,8 +52,8 @@ end Namer.Decompose = Decompose;
 local Copy = function(self)
 	local EntriesCopy = OrderedMap()
 	--for Name, Entry in pairs(self.Entries) do
-	for NameIndex = 1, self.Entries:NumKeys() do
-		local Name, Entry = self.Entries:GetPair(NameIndex)
+	for NameIndex = 1, NumKeys(self.Entries) do
+		local Name, Entry = GetPair(self.Entries,NameIndex)
 		EntriesCopy:Add(Name, Entry:Copy())
 		--EntriesCopy[Name] = -Entry
 	end
@@ -61,8 +63,8 @@ end Namer.Copy = Copy;
 
 local Merge = function(Into, From)
 	--for Name, Entry in pairs(From.Entries) do
-	for NameIndex = 1, From.Entries:NumKeys() do
-		local Name, Entry = From.Entries:GetPair(NameIndex)
+	for NameIndex = 1, NumKeys(From.Entries) do
+		local Name, Entry = GetPair(From.Entries, NameIndex)
 		--Into.Entries[Name] = Entry
 		Into.Entries:Add(Name, Entry)
 	end

@@ -11,14 +11,16 @@ local Completable = OOP.Declarator.Shortcuts(
 )
 
 local Decompose = function(self, Canonical)
-	return Transform.Completable(
-		self.Pattern(Canonical), 
+	local Decomposed = Transform.Completable(
+		self.Pattern:Decompose(Canonical), 
 		self.Function
 	)
+	return Decomposed
 end; Completable.Decompose = Decompose;
 
 local Copy = function(self)
-	return Completable(-self.Pattern, self.Function)
+	local New = Completable(self.Pattern:Copy(), self.Function)
+	return New
 end; Completable.Copy = Copy;
 
 Completable.Initialize = function(_, self, Pattern, Function)

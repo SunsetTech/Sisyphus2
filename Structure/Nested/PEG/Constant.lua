@@ -9,17 +9,20 @@ local Constant = OOP.Declarator.Shortcuts(
 	}
 )
 
+local function Decompose(self, Canonical)
+	local Decomposed = Vlpeg.Constant(self.Value)
+	return Decomposed
+end
+
+local function Copy(self)
+	local New = Constant(self.Value)
+	return New
+end
+
 function Constant:Initialize(Instance, Value)
 	Instance.Value = Value
-	Instance.Decompose = Constant.Decompose
-end
-
-function Constant:Decompose(Canonical)
-	return Vlpeg.Constant(self.Value)
-end
-
-function Constant:Copy()
-	return Constant(self.Value)
+	Instance.Decompose = Decompose
+	Instance.Copy = Copy
 end
 
 return Constant

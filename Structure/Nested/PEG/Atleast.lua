@@ -13,11 +13,13 @@ function Atleast:Initialize(Instance, Amount, InnerPattern)
 end
 
 function Atleast:Decompose(Canonical)
-	return self.InnerPattern(Canonical)^self.Amount
+	local Decomposed = self.InnerPattern:Decompose(Canonical)^self.Amount
+	return Decomposed
 end
 
 function Atleast:Copy()
-	return Atleast(self.Amount, self.InnerPattern:Copy())
+	local New = Atleast(self.Amount, self.InnerPattern:Copy())
+	return New
 end
 
 function Atleast:ToString()

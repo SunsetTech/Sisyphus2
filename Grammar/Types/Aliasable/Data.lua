@@ -17,10 +17,11 @@ local function CreateNamespaceFor(Entry, Canonical)
 	Namespace.Children.Entries:Add(Canonical.Name, Entry)
 	
 	if Canonical.Namespace then
-		return CreateNamespaceFor(
+		local New = CreateNamespaceFor(
 			Namespace,
 			Canonical.Namespace
 		)
+		return New
 	else
 		return Namespace
 	end
@@ -43,15 +44,38 @@ local function PassThrough(...)
 	return ...
 end
 
+local function GenerateArrayType(Canonical, Specifier) -- Generate the match Specifier and the Added Types
+	local GeneratedTypes = Aliasable.Namespace()
+
+	if Specifier.GeneratedTypes then
+		GeneratedTypes = GeneratedTypes + Specifier.GeneratedTypes
+	end
+	
+	
+	local InstanceName = CanonicalName(Canonical.Name .."<".. Specifier.Target:Decompose(true) ..">", Canonical.Namespace)
+	
+	local Namespace = CreateNamespaceFor(
+		Aliasable.Type.Definition(
+			Construct.ArgumentArray(
+				Construct.AliasableType(Specifier.Target:Decompose(true))
+			),
+			Box
+		),
+		InstanceName
+	)
+	return 
+		InstanceName:Invert(),
+		GeneratedTypes
+		+ Namespace
+end
+
 return Aliasable.Namespace {
 	Boolean = Aliasable.Type.Definition(
 		PEG.Select{
 			PEG.Sequence{PEG.Pattern"true", PEG.Constant(true)},
 			PEG.Sequence{PEG.Pattern"false", PEG.Constant(false)}
 		},
-		function(...)
-			return ...
-		end
+		PassThrough
 	);
 
 	String = Aliasable.Type.Definition(
@@ -77,33 +101,11 @@ return Aliasable.Namespace {
 		PEG.Pattern"Array",
 		function(Canonical)--Array<TypeSpecifier>
 			Canonical = InvertName(Canonical)
-			return PEG.Apply(
-				Construct.ArgumentList{Variable.Canonical"Types.Basic.Template.TypeSpecifier"},
-				function(Specifier) -- Generate the match Specifier and the Added Types
-					local GeneratedTypes = Aliasable.Namespace()
-
-					if Specifier.GeneratedTypes then
-						GeneratedTypes = GeneratedTypes + Specifier.GeneratedTypes
-					end
-					
-					
-					local InstanceName = CanonicalName(Canonical.Name .."<".. Specifier.Target(true) ..">", Canonical.Namespace)
-					
-					local Namespace = CreateNamespaceFor(
-						Aliasable.Type.Definition(
-							Construct.ArgumentArray(
-								Construct.AliasableType(Specifier.Target(true))
-							),
-							Box
-						),
-						InstanceName
-					)
-					return 
-						InvertName(InstanceName),
-						GeneratedTypes
-						+ Namespace
-				end
+			local New = PEG.Apply(
+				PEG.Sequence{PEG.Constant(Canonical), Construct.ArgumentList{Variable.Canonical"Types.Basic.Template.TypeSpecifier"}},
+				GenerateArrayType
 			)
+			return New
 		end
 	);
 }

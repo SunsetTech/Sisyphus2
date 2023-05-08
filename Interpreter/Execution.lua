@@ -12,7 +12,8 @@ function Resolvable:Initialize(Instance, Resolve)
 end
 
 function Resolvable:__call(...)
-	return self.Resolve(...)
+	local Return = self.Resolve(...)
+	return Return
 end
 
 local Incomplete = OOP.Declarator.Shortcuts"incomplete"
@@ -30,24 +31,36 @@ function LazyValue:__call()
 	return self.Value
 end
 
-function Incomplete:__call(Environment)
-	--Tools.Error.CallerAssert(type(Environment) == "table", "oops")
-	local CurrentArguments = {}
-	--for Index, Argument in pairs(Arguments) do
-	for Index = 1, #self.Arguments do local Argument = self.Arguments[Index]
-		local Returns
+local function Incomplete_LoopBody(Argument, Environment, CurrentArguments)
+		local Return
 		if type(Argument) == "resolvable" then
-			Returns = {Argument(Environment)}
+			Return = Argument(Environment)
 		else
-			Returns = {Argument}
+			Return = Argument
 		end
-		--for _, Return in pairs(Returns) do
-		for ReturnIndex = 1, #Returns do
-			--local Return = Returns[ReturnIndex]
-			table.insert(CurrentArguments, Returns[ReturnIndex])
+		table.insert(CurrentArguments, Return)
+end
+
+function Incomplete:__call(Environment)
+	local CurrentArguments = {}
+	if #self.Arguments > 1 then
+		for Index = 1, #self.Arguments do 
+			local Argument = self.Arguments[Index]
+			Incomplete_LoopBody(Argument, Environment, CurrentArguments)
 		end
+	else
+		Incomplete_LoopBody(self.Arguments[1], Environment, CurrentArguments)
 	end
-	return self.Function(table.unpack(CurrentArguments))
+	
+	local Return = self.Function(table.unpack(CurrentArguments))
+	return Return
+end
+local function Freeze_LoopBody(Arguments, Index)
+	local Argument = Arguments[Index]
+	
+	if type(Argument) == "resolvable" then
+		return true
+	end
 end
 
 local Transform
@@ -56,27 +69,32 @@ Transform = {
 	Resolvable = Resolvable;
 	
 	Incomplete = function(Arguments, Function)
-		return Transform.Resolvable(Incomplete(Arguments, Function))
+		local New = Transform.Resolvable(Incomplete(Arguments, Function))
+		return New
 	end;
 
 	Freeze = function(Function, Arguments)
 		--local Arguments = {...} 
 		
 		local Incomplete = false
-		for Index = 1, #Arguments do
-			local Argument = Arguments[Index]
-			
-			if type(Argument) == "resolvable" then
-				Incomplete = true
-				break
+		if #Arguments > 1 then
+			for Index = 1, #Arguments do
+				--[[if not Incomplete then 
+					Incomplete = Freeze_LoopBody(Arguments, Index)
+				end]]
+				Incomplete = not Incomplete and Freeze_LoopBody(Arguments, Index) or Incomplete
 			end
+		else
+			Incomplete = Freeze_LoopBody(Arguments, 1)
 		end
 		
+		local Return
 		if Incomplete then
-			return Transform.Incomplete(Arguments, Function)
+			Return = Transform.Incomplete(Arguments, Function)
 		else
-			return Function(table.unpack(Arguments)) --no incomplete arguments, simply apply and return
+			Return = Function(table.unpack(Arguments)) --no incomplete arguments, simply apply and return
 		end
+		return Return
 	end;
 
 	Completable = function(Pattern, Function)
@@ -86,7 +104,8 @@ Transform = {
 			the return value is also an incomplete transform that when called
 			attempts to resolve all incomplete arguments, and then return the application of Function over all arguments
 		]]
-		return (Vlpeg.Constant(Function) * Vlpeg.Table(Pattern)) / Transform.Freeze
+		local New = (Vlpeg.Constant(Function) * Vlpeg.Table(Pattern)) / Transform.Freeze
+		return New
 	end;
 }
 

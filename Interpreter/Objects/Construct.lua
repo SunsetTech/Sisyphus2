@@ -13,42 +13,46 @@ local Static = Import.Module.Sister"Static"
 local Package
 
 local function JumpToGrammar(Subject, Position, Grammar, ...)
-	return Vlpeg.Match(
+	local Position, Returns = Vlpeg.Match(
 		Vlpeg.Apply(
 			Vlpeg.Sequence(
 				Tools.Error.NotMine(Vlpeg.Table,Grammar), 
 				Vlpeg.Position()
 			),
 			function(Returns, Position)
-				return Position, table.unpack(Returns)
+				return Position, Returns
 			end
 		),
 		Subject, Position, ...
 	)
+	return Position, table.unpack(Returns or {})
 end
 local function SetGrammar(NewGrammar, Environment)
 	--Tools.Error.CallerAssert(NewGrammar%"Aliasable.Grammar")
+	local New = NewGrammar/"userdata"
 	return 
-		NewGrammar/"userdata", {
+		New, {
 			Grammar = NewGrammar;
 			Variables = Tools.Table.Copy(Environment.Variables);
 		}
 end
 Package = {
 	DynamicParse = function(Pattern) --Matches Pattern which should produce an lpeg grammar/pattern and any number of arguments, then jumps to the returned grammar at the current position
-		return PEG.Immediate(Pattern, JumpToGrammar)
+		local New = PEG.Immediate(Pattern, JumpToGrammar)
+		return New
 	end;
 	
 	ChangeGrammar = function(Pattern) --matches Pattern which should produce an Aliasable.Grammar, then return it and a copy of the current state to DynamicParse
-		return Package.DynamicParse(
+		local New = Package.DynamicParse(
 			PEG.Apply(
 				PEG.Sequence{Pattern, Static.GetEnvironment}, SetGrammar
 			)
 		)
+		return New
 	end;
 
 	Invocation = function(Disambiguator, Pattern, Function)
-		return PEG.Apply(
+		local New = PEG.Apply(
 			PEG.Sequence{
 				Syntax.Tokens{
 					PEG.Pattern(Disambiguator),
@@ -58,42 +62,49 @@ Package = {
 			},
 			Function
 		)
+		return New
 	end;
 
 	Delimited = function(Open, Pattern, Close, Joiner)
 		--Joiner = Joiner or Syntax.Tokens
-		return (Joiner or Syntax.Tokens){Open, Pattern, Close}
+		local New = (Joiner or Syntax.Tokens){Open, Pattern, Close}
+		return New
 	end;
 
 	Quoted = function(Delimiter, Pattern)
-		return Package.Delimited(Delimiter, Pattern, Delimiter)
+		local New = Package.Delimited(Delimiter, Pattern, Delimiter)
+		return New
 	end;
 
 	Centered = function(Pattern)
-		return Package.Quoted(PEG.All(Static.Whitespace), Pattern)
+		local New = Package.Quoted(PEG.All(Static.Whitespace), Pattern)
+		return New
 	end;
 	
 	Array = function(Pattern, Seperator, Joiner)
 		Joiner = Joiner or Syntax.Tokens
-		return Joiner{Pattern, PEG.All(Joiner{Seperator, Pattern})}
+		local New = Joiner{Pattern, PEG.All(Joiner{Seperator, Pattern})}
+		return New
 	end;
 	
 	BasicNamespace = function(Name)
-		return Variable.Canonical(
-			CanonicalName(
+		local Name = CanonicalName(
 				Name,
 				CanonicalName"Types.Basic"
-			)()
+			)
+		local New = Variable.Canonical(
+			Name:Decompose()
 		)
+		return New
 	end;
 
 	AliasableType = function(Name)
-		return PEG.Select{
+		local New = PEG.Select{
 			Variable.Canonical(
 				CanonicalName(
 					Name,
 					CanonicalName"Types.Aliasable"
-				)()
+				):Decompose()
 			),
 			PEG.Sequence{
 				PEG.Group(PEG.Constant(Name), "Basetype"),
@@ -101,10 +112,11 @@ Package = {
 				PEG.Group(PEG.Constant(nil), "Basetype")
 			}
 		}
+		return New
 	end;
 
 	ArgumentArray = function(ArgumentPattern)
-		return Package.Delimited(
+		local New = Package.Delimited(
 			PEG.Pattern"<",
 			Package.Array(
 				ArgumentPattern,
@@ -112,6 +124,7 @@ Package = {
 			),
 			PEG.Pattern">"
 		)
+		return New
 	end;
 
 	ArgumentList = function(Patterns)
@@ -121,10 +134,11 @@ Package = {
 			Undelimited,
 			PEG.Pattern">"
 		)
-		return PEG.Select{
+		local New = PEG.Select{
 			Undelimited,
 			Delimited
 		}
+		return New
 	end;
 }
 

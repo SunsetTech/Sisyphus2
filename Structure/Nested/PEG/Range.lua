@@ -14,11 +14,13 @@ Range.Initialize = function(_, self, ...)
 end;
 
 Range.Decompose = function(self)
-	return Vlpeg.Range(table.unpack(self.Sets))
+	local Decomposed = Vlpeg.Range(table.unpack(self.Sets))
+	return Decomposed
 end;
 
 Range.Copy = function(self)
-	return Range(table.unpack(Tools.Table.Copy(self.Sets)))
+	local New = Range(table.unpack(Tools.Table.Copy(self.Sets)))
+	return New
 end;
 
 Range.ToString = function(self)

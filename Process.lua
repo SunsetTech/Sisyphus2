@@ -16,7 +16,7 @@ local Vlpeg = require"Sisyphus2.Vlpeg"
 local Structure = require"Sisyphus2.Structure"
 
 local TemplateGrammar = require"Sisyphus2.Grammar"
-local AliasableGrammar = TemplateGrammar()
+local AliasableGrammar = TemplateGrammar:Decompose()
 local Grammar = AliasableGrammar/"userdata"
 
 local InputPath = arg[1] or error"Supply filename"
@@ -28,7 +28,8 @@ InputFile:close()
 
 print"_____"
 local StartTime = getTime()
-debug.sethook(nil,"clr")
+collectgarbage"stop"
+--debug.sethook(nil,"clr")
 local Output = Tools.Filesystem.ChangePath(
 	Tools.Path.Join(Tools.Path.DirName(InputPath)),
 	Vlpeg.Match,
@@ -39,8 +40,8 @@ local Output = Tools.Filesystem.ChangePath(
 )
 print"_____"
 print(Output)
-print(collectgarbage("count")/1024)
-print(getTime()-StartTime .."s")
+print(collectgarbage("count")/1024 .."MB")
+print((getTime()-StartTime)*1000 .."ms")
 --[[for Name, Amount in pairs(Structure.Object.TotalCopies) do
 	--print(Amount .." ".. Name .." copies created")
 end]]

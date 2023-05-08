@@ -25,15 +25,17 @@ Definition.Initialize = function(_, self, Pattern, Syntax, Types)
 end;
 
 Definition.Decompose = function(self)
-	return Basic.Grammar(
+	local Decomposed = Basic.Grammar(
 		self.Pattern,
 		self.Types,
 		self.Syntax
-	)()
+	):Decompose()
+	return Decomposed
 end;
 
 Definition.Copy = function(self)
-	return Definition(self.Pattern:Copy(), self.Syntax:Copy(), self.Types:Copy())
+	local New = Definition(self.Pattern:Copy(), self.Syntax:Copy(), self.Types:Copy())
+	return New
 end;
 
 return Definition

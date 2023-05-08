@@ -11,7 +11,8 @@ local Group = OOP.Declarator.Shortcuts(
 )
 
 local function Decompose(self, Canonical)
-	return Vlpeg.Group(self.InnerPattern(Canonical), self.Name)
+	local Decomposed = Vlpeg.Group(self.InnerPattern:Decompose(Canonical), self.Name)
+	return Decomposed
 end
 
 ---@param Instance Sisyphus2.Structure.Nested.PEG.Group
@@ -22,7 +23,8 @@ function Group:Initialize(Instance, InnerPattern, Name)
 end
 
 function Group:Copy()
-	return Group(-self.InnerPattern, self.Name)
+	local New = Group(self.InnerPattern:Copy(), self.Name)
+	return New
 end
 
 function Group:ToString()

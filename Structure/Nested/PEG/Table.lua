@@ -12,11 +12,11 @@ Table.Initialize = function(_,self, InnerPattern)
 end;
 
 Table.Decompose = function(self, Canonical)
-	return Vlpeg.Table(self.InnerPattern(Canonical))
+	return Vlpeg.Table(self.InnerPattern:Decompose(Canonical))
 end;
 
 Table.Copy = function(self)
-	return Table(-self.InnerPattern)
+	return Table(self.InnerPattern:Copy())
 end;
 
 Table.ToString = function(self)

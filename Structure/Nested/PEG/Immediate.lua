@@ -10,21 +10,25 @@ local Immediate = OOP.Declarator.Shortcuts(
 	}
 )
 
+local Decompose = function(self, Canonical)
+	local Decomposed = Vlpeg.Immediate(
+		self.InnerPattern:Decompose(Canonical), 
+		self.Function
+	)
+	return Decomposed
+end;
+
+local Copy = function(self)
+	local New = Immediate(self.InnerPattern:Copy(), self.Function)
+	return New
+end;
+
 ---@param Instance Sisyphus2.Structure.Nested.PEG.Immediate
 function Immediate:Initialize(Instance, InnerPattern, Function)
 	Instance.InnerPattern = InnerPattern
 	Instance.Function = Function
-end;
-
-Immediate.Decompose = function(self, Canonical)
-	return Vlpeg.Immediate(
-		self.InnerPattern(Canonical), 
-		self.Function
-	)
-end;
-
-Immediate.Copy = function(self)
-	return Immediate(-self.InnerPattern, self.Function)
+	Instance.Copy = Copy
+	Instance.Decompose = Decompose
 end;
 
 Immediate.ToString = function(self)

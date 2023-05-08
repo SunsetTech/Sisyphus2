@@ -23,43 +23,61 @@ function Definition.Arguments(Parameters)
 	--for Index, Parameter in pairs(Parameters) do
 	for Index = 1, #Parameters do
 		local Parameter = Parameters[Index]
-		ArgumentPatterns[Index] = Parse.AliasableType(Parameter.Specifier.Target:Invert()())
+		ArgumentPatterns[Index] = Parse.AliasableType(Parameter.Specifier.Target:Decompose(true))
 	end
 
-	return Parse.ArgumentList(ArgumentPatterns)
+	local New = Parse.ArgumentList(ArgumentPatterns)
+	return New
 end
 
-function Definition.Invoker(Parameters, Body) 
-	return function(Environment, ...)
+local function SetVariable(Environment, Parameters, Index, OldValues, Arguments)
+	local Parameter = Parameters[Index]
+	Environment.Variables[Parameter.Name] = Arguments[Index]
+	OldValues[Parameter.Name] = Environment.Variables[Parameter.Name]
+end
+
+local function RestoreVariable(Environment, Parameters, Index, OldValues)
+	local Parameter = Parameters[Index]
+	Environment.Variables[Parameter.Name] = OldValues[Parameter.Name]
+end
+
+function Definition.Invoker(Parameters, Body) --NOTE not sure we can fix this NYI 
+	local New = function(Environment, ...)
 		local Arguments = {...}
 		local OldValues = {}
 		
 		--for Index, Parameter in pairs(Parameters) do
-		for Index = 1,#Parameters do
-			local Parameter = Parameters[Index]
-			Environment.Variables[Parameter.Name] = Arguments[Index]
-			OldValues[Parameter.Name] = Environment.Variables[Parameter.Name]
+		if #Parameters > 1 then
+			for Index = 1,#Parameters do
+				SetVariable(Environment, Parameters, Index, OldValues, Arguments)
+			end
+		else
+			SetVariable(Environment, Parameters, 1, OldValues, Arguments)
 		end
 		
 		local LastBody = Environment.Body
 		Environment.Body = Body
-			local Returns = {Body(Environment)}
+			local Returns = Body(Environment)
 		Environment.Body = LastBody
 
-		for Index = 1,#Parameters do
-			local Parameter = Parameters[Index]
-			Environment.Variables[Parameter.Name] = OldValues[Parameter.Name]
+		if #Parameters > 1 then
+			for Index = 1,#Parameters do
+				RestoreVariable(Environment, Parameters, Index, OldValues)
+			end
+		else
+			RestoreVariable(Environment, Parameters, 1, OldValues)
 		end
 		
-		return table.unpack(Returns)
+		return Returns
 	end
+	print("aaa",New)
+	return New
 end
 
 --Parses the template grammar for the newly defined template
 function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
-	return function(Body)
-		return 
-			Generate.Namespace.Template(
+	local New = function(Body)
+		local New = Generate.Namespace.Template(
 				Template.Definition(
 					Basetype,
 					Aliasable.Type.Definition(
@@ -76,20 +94,23 @@ function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 					)
 				),
 				Name
-			),
+			)
+		return 
+			New,
 			GeneratedTypes
 	end
+
+	return New
 end
 
 ---fuck how do we even annotate this
+local function Passthrough(...)
+	return ...
+end
 ---@param ... any
 function Definition.Return(...) -- I forget why this was necessary
-	return Execution.Incomplete(
-		{...},
-		function(...)
-			return ...
-		end
-	)
+	local New = Execution.Incomplete( {...}, Passthrough)
+	return New
 end
 
 function Definition.GenerateVariables(Parameters)
@@ -131,11 +152,23 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 			CurrentGrammar.Syntax,
 			CurrentGrammar.Information
 		),
-		VariablesNamespace + Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)(
-			function(...) 
+		VariablesNamespace + Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)( --Recursion
+			function(Environment) 
+				local SavedVariables = {}
+				for K,V in pairs(Environment.Variables) do
+					print(K,V)
+					SavedVariables[K] = V
+				end
 				return Execution.Resolvable(
 					function(Environment)
-						return Environment.Body(Environment)
+						local Body = Environment.Body
+						--print("bbb", Body.Resolve.Function)
+						return Execution.Resolvable(
+							function()
+								return Body{Body = Body, Variables = SavedVariables}
+								--return "Lazy Evaluation NYI"--Body(Environment)
+							end
+						)
 					end
 				) 
 			end
@@ -145,7 +178,7 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 	DefinitionGrammar.InitialPattern = PEG.Apply( --Edit the initial pattern to match Basetype
 		PEG.Apply(
 			Parse.Centered(
-				Parse.AliasableType(Basetype(true))
+				Parse.AliasableType(Basetype:Decompose(true))
 			) , --The returns matching the type, either values or a resolvable representing the unfinished transform
 			Definition.Return
 		),

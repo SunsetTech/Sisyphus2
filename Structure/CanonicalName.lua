@@ -9,19 +9,30 @@ local CanonicalName = OOP.Declarator.Shortcuts(
 	}
 )
 
+
+--Courtesy GPT4
 local function Decompose(self, Reverse)
-	return 
-		self.Namespace 
-		and (
-			Reverse 
-			and (self.Name ..".".. self.Namespace(Reverse))
-			or (self.Namespace() ..".".. self.Name)
-		) 
-		or self.Name
+    local Ret = ""
+    local current = self
+    local separator = ""
+
+    while current do
+        if Reverse then
+            Ret = Ret .. separator .. current.Name
+        else
+            Ret = current.Name .. separator .. Ret
+        end
+
+        separator = "."
+        current = current.Namespace
+    end
+
+    return Ret
 end
 
 local function Copy(self)
-	return CanonicalName(self.Name, self.Namespace and self.Namespace:Copy() or nil)
+	local New = CanonicalName(self.Name, self.Namespace and self.Namespace:Copy() or nil)
+	return New
 end
 
 local function Invert(self)

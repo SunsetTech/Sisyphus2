@@ -6,16 +6,10 @@ local Array = OOP.Declarator.Shortcuts(
 	}
 )
 
-Array.Initialize = function(_, self, Type, Items)
-	self.Type = Type
-	self.Items = Items
-	self.Decompose = Array.Decompose
-	self.Copy = Array.Copy
-end;
-
-Array.Decompose = function(self, ...)
-	local Count = select("#", ...)
-	local Args = {...}
+local Decompose = function(self, Argument)
+	--[[local Count = select("#", ...)
+	print(Count)
+	local Args = {...}]]
 	local Decomposed = {}
 	
 	for Index = 1, #self.Items do
@@ -23,13 +17,13 @@ Array.Decompose = function(self, ...)
 		--Tools.Error.CallerAssert(type(Index) == "number", "Expected a numeric index, got ".. Index)
 		--Tools.Error.CallerAssert(Item%(self.Type), "Expected a ".. self.Type)
 	
-		Decomposed[Index] = Item(table.unpack(Args,1,Count))
+		Decomposed[Index] = Item:Decompose(Argument)
 	end
 
 	return Decomposed
 end;
 
-Array.Copy = function(self)
+local Copy = function(self)
 	local ItemsCopy = {}
 	
 	for Index = 1, #self.Items do
@@ -37,7 +31,15 @@ Array.Copy = function(self)
 		ItemsCopy[Index] = Item:Copy()
 	end
 	
-	return Array(self.Type, ItemsCopy)
+	local New = Array(self.Type, ItemsCopy)
+	return New
 end;
 
+
+Array.Initialize = function(_, self, Type, Items)
+	self.Type = Type
+	self.Items = Items
+	self.Decompose = Decompose
+	self.Copy = Copy
+end;
 return Array

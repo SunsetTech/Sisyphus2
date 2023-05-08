@@ -8,10 +8,11 @@ function Namespace.Template(Entry, Canonical)
 	Namespace.Children.Entries:Add(Canonical.Name, Entry)
 	
 	if Canonical.Namespace then
-		return Namespace.Template(
+		local New = Namespace.Template(
 			Namespace,
 			Canonical.Namespace
 		)
+		return New
 	else
 		return Namespace
 	end

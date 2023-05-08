@@ -1,23 +1,19 @@
-local Import = require"Toolbox.Import"
-
-local Structure = require"Sisyphus2.Structure"
-local Nested = Structure.Nested
-local PEG = Nested.PEG
-local Aliasable = Structure.Aliasable
-local Template = Structure.Template
-
-local Parse = require"Sisyphus2.Interpreter.Objects.Parse"
 local Execution = require"Sisyphus2.Interpreter.Execution"
 
 local Argument = {}
 
+local __call = function(self, Environment)
+	return Environment.Variables[self.Location]
+end
+
+local MT = {__call=__call}
+
 function Argument.Resolver(Location)
 	return function()
-		return Execution.Resolvable(
-			function(Environment)
-				return Environment.Variables[Location]
-			end
+		local New = Execution.Resolvable(
+			setmetatable({Location=Location},MT)
 		)
+		return New
 	end
 end
 

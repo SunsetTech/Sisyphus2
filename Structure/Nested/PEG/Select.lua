@@ -22,12 +22,14 @@ Select.Initialize = function(_, self, Options, _Options)
 end;
 
 Select.Decompose = function(self, Canonical)
-	local Patterns = self.Options(Canonical)
-	return Vlpeg.Select(table.unpack(Patterns)) or PEG.Pattern(false)()
+	local Patterns = self.Options:Decompose(Canonical)
+	local Decomposed = Vlpeg.Select(table.unpack(Patterns)) or Vlpeg.Pattern(false)
+	return Decomposed
 end;
 
 Select.Copy = function(self)
-	return Select(nil, (self.Options:Copy()))
+	local New = Select(nil, self.Options:Copy())
+	return New
 end;
 
 Select.ToString = function(self)

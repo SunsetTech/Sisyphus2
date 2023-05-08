@@ -147,7 +147,7 @@ return Basic.Type.Set{
 					
 					local CurrentGrammar = Environment.Grammar
 
-					return Template.Grammar(
+					local New = Template.Grammar(
 						Aliasable.Grammar(
 							CurrentGrammar.InitialPattern,
 							CurrentGrammar.AliasableTypes + GeneratedTypes,
@@ -156,7 +156,8 @@ return Basic.Type.Set{
 							CurrentGrammar.Information
 						),
 						Namespace
-					)()
+					):Decompose()
+					return New
 				end
 			)
 		);

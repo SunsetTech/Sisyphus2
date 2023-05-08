@@ -9,18 +9,21 @@ local Capture = OOP.Declarator.Shortcuts(
 	}
 )
 
+local function Decompose(self, Canonical)
+	local Decomposed = lpeg.C(self.SubPattern:Decompose(Canonical))
+	return Decomposed
+end
+
+local function Copy(self)
+	local New = Capture(self.SubPattern:Copy())
+	return New
+end
+
 ---@param Instance Sisyphus2.Structure.Nested.PEG.Capture
 function Capture:Initialize(Instance, SubPattern)
 	Instance.SubPattern = SubPattern
-	Instance.Decompose = Capture.Decompose
-end
-
-function Capture:Decompose(Canonical)
-	return lpeg.C(self.SubPattern(Canonical))
-end
-
-function Capture:Copy()
-	return Capture(self.SubPattern:Copy())
+	Instance.Decompose = Decompose
+	Instance.Copy = Copy
 end
 
 function Capture:ToString()

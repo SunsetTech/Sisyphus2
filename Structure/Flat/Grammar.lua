@@ -14,7 +14,8 @@ local Grammar = OOP.Declarator.Shortcuts(
 
 ---@param self Sisyphus2.Structure.Flat.Grammar
 local function Decompose(self)
-	return lpeg.P(self.Rules.Pairs)
+	local Decomposed = lpeg.P(self.Rules.Pairs)
+	return Decomposed
 end; Grammar.Decompose = Decompose
 
 ---@param self Sisyphus2.Structure.Flat.Grammar
@@ -24,7 +25,8 @@ local function Copy(self)
 		--local Name, Rule = self.Rules:GetPair(Index)
 		Rules:Add(self.Rules:GetPair(Index))
 	end
-	return Grammar(nil, Rules)
+	local New = Grammar(nil, Rules)
+	return New
 end; Grammar.Copy = Copy
 
 ---@param self Sisyphus2.Structure.Flat.Grammar

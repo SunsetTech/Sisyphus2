@@ -8,7 +8,8 @@ local Set = OOP.Declarator.Shortcuts(
 )
 
 local Decompose = function(self)
-	return Vlpeg.Set(self.Characters)
+	local Decomposed = Vlpeg.Set(self.Characters)
+	return Decomposed
 end;
 
 Set.Initialize = function(_, self, Characters)
@@ -17,7 +18,8 @@ Set.Initialize = function(_, self, Characters)
 end;
 
 Set.Copy = function(self)
-	return Set(self.Characters)
+	local New = Set(self.Characters)
+	return New
 end;
 
 Set.ToString = function(self)

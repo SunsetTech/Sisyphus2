@@ -8,11 +8,13 @@ local Position = OOP.Declarator.Shortcuts(
 )
 
 Position.Decompose = function(self, Canonical)
-	return Vlpeg.Position()
+	local Decomposed = Vlpeg.Position()
+	return Decomposed
 end;
 
 Position.Copy = function(self)
-	return Position()
+	local New = Position()
+	return New
 end;
 
 return Position

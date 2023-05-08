@@ -10,30 +10,33 @@ local AliasList = OOP.Declarator.Shortcuts(
 	}
 )
 
-AliasList.Initialize = function(_, self, Names)
-	self.Names = Names or {}
-	self.Decompose = AliasList.Decompose
-	--[[for Index, _ in pairs(self.Names) do
-		Tools.Error.CallerAssert(type(Index) == "number", "hmm")
-	end]]
-end;
-
-AliasList.Decompose = function(self)
+local Decompose = function(self)
 	local Variables = {}
 	--for Index, Name in pairs(self.Names) do
 	for Index = 1, #self.Names do local Name = self.Names[Index]
 		Variables[Index] = PEG.Sequence{PEG.Pattern":", PEG.Variable.Canonical(Name)}
 	end
-	return PEG.Select(Variables)
+	local New = PEG.Select(Variables)
+	return New
 end;
 
-AliasList.Copy = function(self)
+local Copy = function(self)
 	local Names = {}
 	for Index = 1, #self.Names do local Name = self.Names[Index]
 		Names[Index] = Name
 	end
-	return AliasList(Names)
+	local New = AliasList(Names)
+	return New
 	--return Tools.Table.Copy(self.Names)
 end;
 
+
+AliasList.Initialize = function(_, self, Names)
+	self.Names = Names or {}
+	self.Decompose = Decompose
+	self.Copy = Copy
+	--[[for Index, _ in pairs(self.Names) do
+		Tools.Error.CallerAssert(type(Index) == "number", "hmm")
+	end]]
+end;
 return AliasList

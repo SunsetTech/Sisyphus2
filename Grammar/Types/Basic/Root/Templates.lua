@@ -11,6 +11,13 @@ local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 local Syntax = require"Sisyphus2.Interpreter.Objects.Syntax"
 local Static = require"Sisyphus2.Interpreter.Objects.Static"
 
+local function Compare(Switch, Left, Right)
+	return 
+		Switch
+		and Left
+		or Right
+end
+
 return Basic.Type.Set{
 	If = Basic.Type.Definition(
 		Syntax.Tokens{
@@ -22,21 +29,15 @@ return Basic.Type.Set{
 						Static.GetEnvironment
 					},
 					function(Basetype, Environment)
-						local GrammarCopy = -Environment.Grammar
+						local GrammarCopy = Environment.Grammar:Copy()
 
 						GrammarCopy.InitialPattern = Aliasable.Type.Definition(
 							Construct.ArgumentList{
 								Construct.AliasableType"Data.Boolean",
 								Construct.AliasableType(Basetype),
 								Construct.AliasableType(Basetype)
-							},
-							
-							function(Switch, Left, Right)
-								return 
-									Switch
-									and Left
-									or Right
-							end
+							}, 
+							Compare
 						)/"Nested.Grammar"
 						
 						return GrammarCopy

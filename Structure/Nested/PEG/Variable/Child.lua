@@ -9,19 +9,23 @@ local Child = OOP.Declarator.Shortcuts(
 	}
 )
 
+local Copy = function(self)
+	local New = Child(self.Target)
+	return New
+end;
+
+local Decompose = function(self, Canonical)
+	local Decomposed = Vlpeg.Variable(
+		CanonicalName(self.Target, Canonical):Decompose()
+	)
+	return Decomposed
+end;
+
 Child.Initialize = function(_, self, Target)
 	assert(Target)
 	self.Target = Target
-end;
-
-Child.Decompose = function(self, Canonical)
-	return Vlpeg.Variable(
-		CanonicalName(self.Target, Canonical)()
-	)
-end;
-
-Child.Copy = function(self)
-	return Child(self.Target)
+	self.Copy = Copy
+	self.Decompose = Decompose
 end;
 
 Child.ToString = function(self)

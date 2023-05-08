@@ -11,20 +11,22 @@ local Sequence = OOP.Declarator.Shortcuts(
 
 local Decompose = function(self, Canonical)
 	--local Patterns = self.Parts(Canonical)
-	return Vlpeg.Sequence(table.unpack(self.Parts(Canonical)))
+	local Decomposed = Vlpeg.Sequence(table.unpack(self.Parts:Decompose(Canonical)))
+	return Decomposed
 end;
 
+local Copy = function(self)
+	local New = Sequence(nil, (self.Parts:Copy()))
+	return New
+end;
 
 Sequence.Initialize = function(_, self, Parts, _Parts)
 	self.Parts = _Parts or Array("Nested.PEG", Parts)
-	self.Decompose = Sequence.Decompose
-	self.Copy = Sequence.Copy
+	--self.Decompose = Sequence.Decompose
+	self.Copy = Copy
 	self.Decompose = Decompose
 end;
 
-Sequence.Copy = function(self)
-	return Sequence(nil, (self.Parts:Copy()))
-end;
 
 Sequence.ToString = function(self)
 	local Strings = {}

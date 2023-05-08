@@ -30,23 +30,25 @@ end;
 
 Grammar.Decompose = function(self)
 	local Namespace = Basic.Namespace()
-	Namespace.Children.Entries:Add("Aliasable", self.AliasableTypes())
+	Namespace.Children.Entries:Add("Aliasable", self.AliasableTypes:Decompose())
 	Namespace.Children.Entries:Add("Basic", self.BasicTypes)
-	return Basic.Grammar(
+	local Decomposed = Basic.Grammar(
 		self.InitialPattern,
 		Namespace,
 		self.Syntax
 	)
+	return Decomposed
 end;
 
 Grammar.Copy = function(self)
-	return Grammar(
+	local New = Grammar(
 		self.InitialPattern:Copy(), 
 		self.AliasableTypes:Copy(), 
 		self.BasicTypes:Copy(), 
 		self.Syntax:Copy(), 
 		Tools.Table.Copy(self.Information)
 	)
+	return New
 end;
 
 return Grammar

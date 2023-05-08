@@ -20,7 +20,8 @@ Definition.Decompose = function(self)
 end;
 
 Definition.Copy = function(self)
-	return Definition(self.Basetype, -self.Definition)
+	local New = Definition(self.Basetype, self.Definition:Copy())
+	return New
 end
 
 return Definition

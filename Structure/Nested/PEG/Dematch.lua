@@ -13,11 +13,13 @@ Dematch.Initialize = function(_, Instance, Pattern, Without)
 end;
 
 Dematch.Decompose = function(self, Canonical)
-	return self.Pattern(Canonical) - self.Without(Canonical)
+	local Decomposed = self.Pattern:Decompose(Canonical) - self.Without:Decompose(Canonical)
+	return Decomposed
 end;
 
 Dematch.Copy = function(self)
-	return Dematch(self.Pattern:Copy(), self.Without:Copy())
+	local New = Dematch(self.Pattern:Copy(), self.Without:Copy())
+	return New
 end;
 
 Dematch.ToString = function(self)

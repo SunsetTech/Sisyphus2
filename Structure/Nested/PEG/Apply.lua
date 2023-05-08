@@ -7,18 +7,21 @@ local Apply = OOP.Declarator.Shortcuts(
 	}
 )
 
+local function Decompose(self, Canonical)
+	local Decomposed = Vlpeg.Apply(self.Subpattern:Decompose(Canonical), self.Value)
+	return Decomposed
+end
+
+local function Copy(self)
+	local New = Apply(self.Subpattern:Copy(), self.Value)
+	return New
+end
+
 function Apply:Initialize(Instance, Subpattern, Value)
 	Instance.Subpattern = Subpattern
 	Instance.Value = Value
-	Instance.Decompose = Apply.Decompose
-end
-
-function Apply:Decompose(Canonical)
-	return Vlpeg.Apply(self.Subpattern(Canonical), self.Value)
-end
-
-function Apply:Copy()
-	return Apply(self.Subpattern:Copy(), self.Value)
+	Instance.Decompose = Decompose
+	Instance.Copy = Copy
 end
 
 function Apply:ToString()
@@ -26,33 +29,3 @@ function Apply:ToString()
 end
 
 return Apply
-
---[[local Import = require"Moonrise.Import"
-
-local Vlpeg = Import.Module.Relative"Vlpeg"
-
-local Object = Import.Module.Relative"Object"
-
-return Object(
-	"Nested.PEG.Apply", {
-		Construct = function(self, SubPattern, Value)
-			self.SubPattern = SubPattern
-			self.Value = Value
-		end;
-		
-		Decompose = function(self, Canonical)
-			return Vlpeg.Apply(
-				self.SubPattern(Canonical), 
-				self.Value
-			)
-		end;
-
-		Copy = function(self)
-			return -self.SubPattern, self.Value
-		end;
-
-		ToString = function(self)
-			return tostring(self.SubPattern) .."/".. tostring(self.Value)
-		end;
-	}
-)]]

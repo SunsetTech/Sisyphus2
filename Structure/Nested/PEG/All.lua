@@ -6,17 +6,20 @@ local All = OOP.Declarator.Shortcuts(
 	}
 )
 
+local function Decompose(self, Canonical)
+	local Decomposed = self.InnerPattern:Decompose(Canonical)^0
+	return Decomposed
+end
+
+local function Copy(self)
+	local New = All(self.InnerPattern:Copy())
+	return New
+end
+
 function All:Initialize(Instance, InnerPattern)
 	Instance.InnerPattern = InnerPattern
-	Instance.Decompose = All.Decompose
-end
-
-function All:Decompose(Canonical)
-	return self.InnerPattern(Canonical)^0
-end
-
-function All:Copy()
-	return All(-self.InnerPattern)
+	Instance.Decompose = Decompose
+	Instance.Copy = Copy
 end
 
 function All:ToString()

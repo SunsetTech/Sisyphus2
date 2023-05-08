@@ -27,12 +27,12 @@ end;
 
 Definition.Decompose = function(self)
 	local Grammar = Nested.Grammar()
-	Grammar.Rules.Entries:Add("Aliases", self.Aliases())
+	Grammar.Rules.Entries:Add("Aliases", self.Aliases:Decompose())
 	Grammar:Merge(self.Syntax)
 	local Namespace = Basic.Namespace()
-	Namespace.Children.Entries:Add("Aliasable", self.AliasableTypes())
+	Namespace.Children.Entries:Add("Aliasable", self.AliasableTypes:Decompose())
 	Namespace.Children.Entries:Add("Basic", self.BasicTypes)
-	return Basic.Type.Definition(
+	local New = Basic.Type.Definition(
 		Nested.PEG.Select{ 
 			Completable(
 				self.Pattern,
@@ -43,10 +43,12 @@ Definition.Decompose = function(self)
 		Grammar,
 		Namespace
 	)
+	return New
 end;
 
 Definition.Copy = function(self)
-	return Definition(-self.Pattern, self.Function, -self.Syntax, -self.AliasableTypes, -self.BasicTypes, (-self.Aliases).Names)
+	local New = Definition(self.Pattern:Copy(), self.Function, self.Syntax:Copy(), self.AliasableTypes:Copy(), self.BasicTypes:Copy(), (self.Aliases:Copy()).Names)
+	return New
 end;
 
 Definition.Merge = function(Into, From)

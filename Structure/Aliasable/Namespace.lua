@@ -31,7 +31,7 @@ Namespace.Decompose = function(self) -- into a Basic.Namespace
 	local Basics = Basic.Namespace()
 	for Index = 1, self.Children.Entries:NumKeys() do
 		local Name, Entry = self.Children.Entries:GetPair(Index)
-		Basics.Children.Entries:Add(Name, Entry())
+		Basics.Children.Entries:Add(Name, Entry:Decompose())
 	end
 	local Base = self.Base:Copy()
 	Base:Merge(Basics)
@@ -42,7 +42,8 @@ Namespace.Decompose = function(self) -- into a Basic.Namespace
 end;
 
 Namespace.Copy = function(self)
-	return Namespace(nil, self.Base:Copy(), self.Children:Copy())
+	local New = Namespace(nil, self.Base:Copy(), self.Children:Copy())
+	return New
 end;
 
 Namespace.Merge = function(Into, From)

@@ -21,8 +21,24 @@ local Incomplete = OOP.Declarator.Shortcuts(
 	}
 )
 
+local function Generate(Specifier, GeneratedTypes, Environment)
+	local CurrentGrammar = Environment.Grammar
+	local New = Aliasable.Grammar(
+		Construct.AliasableType(Specifier:Decompose()),
+		CurrentGrammar.AliasableTypes + GeneratedTypes,
+		CurrentGrammar.BasicTypes,
+		CurrentGrammar.Syntax,
+		CurrentGrammar.Information
+	)
+	return New
+end
+
+local function Passthrough(...)
+	return ...
+end
+
 local Decompose = function(self)
-	return Aliasable.Type.Definition(
+	local Decomposed = Aliasable.Type.Definition(
 		Construct.ChangeGrammar(
 			PEG.Apply(
 				PEG.Sequence{
@@ -32,30 +48,22 @@ local Decompose = function(self)
 					},
 					Static.GetEnvironment
 				},
-				function(Specifier, GeneratedTypes, Environment)
-					local CurrentGrammar = Environment.Grammar
-					return Aliasable.Grammar(
-						Construct.AliasableType(Specifier()),
-						CurrentGrammar.AliasableTypes + GeneratedTypes,
-						CurrentGrammar.BasicTypes,
-						CurrentGrammar.Syntax,
-						CurrentGrammar.Information
-					)
-				end
+				Generate
 			)
 		),
-		function(...)
-			return ...
-		end,
+		Passthrough,
 		self.Syntax,
 		self.AliasableTypes,
 		self.BasicTypes,
 		self.Aliases
-	)()
+	)
+	Decomposed = Decomposed:Decompose()
+	return Decomposed
 end;
 
 local Copy = function(self)
-	return Incomplete(self.Pattern:Copy(), self.Complete, self.Syntax:Copy(), self.AliasableTypes:Copy(), self.BasicTypes:Copy(), self.Canonical:Copy())
+	local New = Incomplete(self.Pattern:Copy(), self.Complete, self.Syntax:Copy(), self.AliasableTypes:Copy(), self.BasicTypes:Copy(), self.Canonical:Copy())
+	return New
 end;
 
 Incomplete.Initialize = function(_, self, Pattern, Complete, Syntax, AliasableTypes, BasicTypes, Canonical)

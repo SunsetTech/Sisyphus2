@@ -9,7 +9,8 @@ local Optional = OOP.Declarator.Shortcuts(
 )
 
 local Decompose = function(self, Canonical)
-	return self.InnerPattern(Canonical)^-1
+	local Decomposed = self.InnerPattern:Decompose(Canonical)^-1
+	return Decomposed
 end;
 
 ---@param self Sisyphus2.Structure.Nested.PEG.Optional
@@ -20,7 +21,8 @@ Optional.Initialize = function(_, self, InnerPattern)
 end;
 
 Optional.Copy = function(self)
-	return Optional(self.InnerPattern:Copy())
+	local New = Optional(self.InnerPattern:Copy())
+	return New
 end;
 
 Optional.ToString = function(self)

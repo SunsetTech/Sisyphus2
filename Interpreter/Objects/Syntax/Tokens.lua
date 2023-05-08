@@ -11,19 +11,21 @@ local Tokens = OOP.Declarator.Shortcuts(
 	}
 )
 
+local Decompose = function(self, Canonical)
+	local Decomposed = Pattern.Syntax.Tokens(unpack(self.Patterns:Decompose(Canonical)))
+	return Decomposed
+end;
+
+local Copy = function(self)
+	local New = Tokens(nil, self.Patterns:Copy())
+	return New
+end;
+
 Tokens.Initialize = function(_, self, Patterns, _Patterns)
 	self.Patterns = _Patterns or Structure.Array("Nested.PEG", Patterns)
-	self.Decompose = Tokens.Decompose
-	self.Copy = Tokens.Copy
+	self.Decompose = Decompose
+	self.Copy = Copy
 	self.ToString = Tokens.ToString
-end;
-
-Tokens.Decompose = function(self, Canonical)
-	return Pattern.Syntax.Tokens(unpack(self.Patterns(Canonical)))
-end;
-
-Tokens.Copy = function(self)
-	return Tokens(nil, (-self.Patterns))
 end;
 
 Tokens.ToString = function(self)

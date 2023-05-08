@@ -9,18 +9,20 @@ local Sibling = OOP.Declarator.Shortcuts(
 	}
 )
 
-Sibling.Initialize = function(_, self, Target)
-	self.Target = Target
-end;
-
-Sibling.Decompose = function(self, Canonical)
+local Decompose = function(self, Canonical)
 	return lpeg.V(
-		CanonicalName(self.Target, Canonical.Namespace)()
+		CanonicalName(self.Target, Canonical.Namespace):Decompose()
 	)
 end;
 
-Sibling.Copy = function(self)
+local Copy = function(self)
 	return Sibling(self.Target)
+end;
+
+Sibling.Initialize = function(_, self, Target)
+	self.Target = Target
+	self.Decompose = Decompose
+	self.Copy = Copy
 end;
 
 Sibling.ToString = function(self)

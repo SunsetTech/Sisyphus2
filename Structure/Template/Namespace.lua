@@ -20,7 +20,7 @@ Namespace.Decompose = function(self)
 	local Aliasables = Aliasable.Namespace()
 	for Index = 1, self.Children.Entries:NumKeys() do
 		local Name, Entry = self.Children.Entries:GetPair(Index)
-		Aliasables.Children.Entries:Add(Name, Entry())
+		Aliasables.Children.Entries:Add(Name, Entry:Decompose())
 	end
 	local Base = self.Base:Copy()
 	Base:Merge(Aliasables)
@@ -28,7 +28,8 @@ Namespace.Decompose = function(self)
 end;
 
 Namespace.Copy = function(self)
-	return Namespace(nil, self.Base, self.Children:Copy())
+	local New = Namespace(nil, self.Base, self.Children:Copy())
+	return New
 end;
 
 Namespace.Merge = function(Into, From)

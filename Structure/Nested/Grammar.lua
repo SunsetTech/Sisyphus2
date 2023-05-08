@@ -17,16 +17,7 @@ local Grammar = OOP.Declarator.Shortcuts(
 	}
 )
 
-Grammar.Initialize = function(_, self, Rules, Base, _Rules)
-	if _Rules then
-		self.Rules = _Rules
-	else
-		self.Rules = Namer({"Nested.Grammar", "Nested.Rule"}, Rules)
-	end
-	self.Base = Base or Flat.Grammar()
-end;
-
-Grammar.Decompose = function(self, Canonical)
+local Decompose = function(self, Canonical)
 	local ConvertedRules = Namer({"Nested.Grammar", "Nested.Rule"})
 	for NameIndex = 1, self.Rules.Entries:NumKeys() do
 		local Name,Rule = self.Rules.Entries:GetPair(NameIndex)
@@ -37,7 +28,8 @@ Grammar.Decompose = function(self, Canonical)
 		end
 	end
 	
-	local Flattened = Merger("Flat.Grammar", ConvertedRules(Canonical))()
+	local Flattened = Merger("Flat.Grammar", ConvertedRules:Decompose(Canonical))
+	Flattened = Flattened:Decompose()
 	--local Base = 
 	return 
 		Flattened
@@ -46,11 +38,12 @@ Grammar.Decompose = function(self, Canonical)
 end;
 
 
-Grammar.Copy = function(self)
-	return Grammar(nil, self.Base:Copy(), self.Rules:Copy())
+local Copy = function(self)
+	local New = Grammar(nil, self.Base:Copy(), self.Rules:Copy())
+	return New
 end;
 
-Grammar.Merge = function(self, From)
+local Merge = function(self, From)
 	if From.Base then
 		if self.Base then
 			--Into.Base = Into.Base + From.Base
@@ -61,6 +54,18 @@ Grammar.Merge = function(self, From)
 	end
 	--Into.Rules = Namer({"Nested.Grammar", "Nested.Rule"}) + {Into.Rules, From.Rules}
 	self.Rules:Merge(From.Rules)
+end;
+
+Grammar.Initialize = function(_, self, Rules, Base, _Rules)
+	if _Rules then
+		self.Rules = _Rules
+	else
+		self.Rules = Namer({"Nested.Grammar", "Nested.Rule"}, Rules)
+	end
+	self.Base = Base or Flat.Grammar()
+	self.Decompose = Decompose
+	self.Copy = Copy
+	self.Merge = Merge
 end;
 
 return Grammar
