@@ -30,49 +30,7 @@ function Definition.Arguments(Parameters)
 	return New
 end
 
-local function SetVariable(Environment, Parameters, Index, OldValues, Arguments)
-	local Parameter = Parameters[Index]
-	Environment.Variables[Parameter.Name] = Arguments[Index]
-	OldValues[Parameter.Name] = Environment.Variables[Parameter.Name]
-end
 
-local function RestoreVariable(Environment, Parameters, Index, OldValues)
-	local Parameter = Parameters[Index]
-	Environment.Variables[Parameter.Name] = OldValues[Parameter.Name]
-end
-
-function Definition.Invoker(Parameters, Body) --NOTE not sure we can fix this NYI 
-	local New = function(Environment, ...)
-		local Arguments = {...}
-		local OldValues = {}
-		
-		--for Index, Parameter in pairs(Parameters) do
-		if #Parameters > 1 then
-			for Index = 1,#Parameters do
-				SetVariable(Environment, Parameters, Index, OldValues, Arguments)
-			end
-		else
-			SetVariable(Environment, Parameters, 1, OldValues, Arguments)
-		end
-		
-		local LastBody = Environment.Body
-		Environment.Body = Body
-			local Returns = Body(Environment)
-		Environment.Body = LastBody
-
-		if #Parameters > 1 then
-			for Index = 1,#Parameters do
-				RestoreVariable(Environment, Parameters, Index, OldValues)
-			end
-		else
-			RestoreVariable(Environment, Parameters, 1, OldValues)
-		end
-		
-		return Returns
-	end
-	print("aaa",New)
-	return New
-end
 
 --Parses the template grammar for the newly defined template
 function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
@@ -90,7 +48,7 @@ function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 								Definition.Arguments(Parameters),
 							}
 						},
-						Definition.Invoker(Parameters, Body)
+						Execution.Invoker(Parameters, Body)
 					)
 				),
 				Name

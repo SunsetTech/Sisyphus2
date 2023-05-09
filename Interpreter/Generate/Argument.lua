@@ -9,12 +9,15 @@ end
 local MT = {__call=__call}
 
 function Argument.Resolver(Location)
-	return function()
-		local New = Execution.Resolvable(
+	local New = function()
+		--[[local New = Execution.Resolvable(
 			setmetatable({Location=Location},MT)
 		)
-		return New
+		return New]]
+		return Execution.Variable(Location)
 	end
+	print(New)
+	return New
 end
 
 return Argument

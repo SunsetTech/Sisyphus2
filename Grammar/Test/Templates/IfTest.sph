@@ -3,20 +3,4 @@ Templates<
 		If :Argument 
 			"A" 
 			"B"
-	Template IfTestA<Data.Boolean Argument> Data.String 
-		If :Argument 
-			"A" 
-			"B"
-	Template IfTestB<Data.Boolean Argument> Data.String 
-		If :Argument 
-			"A" 
-			"B"
-	Template IfTestC<Data.Boolean Argument> Data.String 
-		If :Argument 
-			"A" 
-			"B"
-	Template IfTestD<Data.Boolean Argument> Data.String 
-		If :Argument 
-			"A" 
-			"B"
 >

@@ -3,12 +3,12 @@ local Tools = require"Toolbox.Tools"
 
 local Structure = require"Sisyphus2.Structure"
 
-local Basic = Structure.Objects.Basic
+local Basic = Structure.Basic
 
-local PEG = require"Sisyphus2.Structure.Objects.Nested.PEG"
+local PEG = require"Sisyphus2.Structure.Nested.PEG"
 local Variable = PEG.Variable
 
-local Objects = Import.Module.Relative"Objects"
+local Objects = require"Sisyphus2.Interpreter.Objects"
 local Static = Objects.Static
 local Construct = Objects.Construct
 
