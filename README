@@ -16,6 +16,7 @@ The interesting bits are under:
 	Grammar/Types/Basic/Template/
 
 Todo:
+	Syntax error reporting (might be hard)
 	I believe the grammar contains some issues particularly around alias selection
 	Forward declaration and mutual recursion
 	Template overloading?
@@ -30,11 +31,18 @@ Todo:
 		Templating a language would look like this:
 			Template DefineTestFunction<Lua.Name Name> Lua.Function.Definition function :A() return "Test" end
 			Template ExtractFunctionName<Lua.Function.Definition Function> Lua.Name :Function.Name
+			Later in some Lua code:
+				function NormallyDefined()
+					return "Test"
+				end
+				:DefineTestFunction TemplateDefined --[[function TemplateDefined() return "Test" end]]
 
+				
 	There are some slight bugs I've identified
 	Investigate syntax highlighting, suspect it may not be possible, or not possible safely
 	Far off: Optimize run time, currently abysmal
-	Further off: A compiler (should be possible)
+		A major problem is the amount of objects created. the main test case "Input" consumres hundreds of MB with the GC off
+	Further off: A compiler (should be possible, naively we could compile template definitions to Lua)
 	Find a better name?
 	Cleanup
 	Description of how execution works
