@@ -9,7 +9,7 @@ local Variable = PEG.Variable
 
 local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 local Syntax = require"Sisyphus2.Interpreter.Objects.Syntax"
-local Static = require"Sisyphus2.Interpreter.Objects.Static"
+local Static = require"Sisyphus2.Interpreter.Parse.Static"
 local Execution = require"Sisyphus2.Interpreter.Execution"
 
 local function Branch(Switch, Left, Right)

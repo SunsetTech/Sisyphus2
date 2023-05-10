@@ -7,7 +7,7 @@ local PEG = Nested.PEG
 local Variable = PEG.Variable
 
 local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
-local Static = require"Sisyphus2.Interpreter.Objects.Static"
+local Static = require"Sisyphus2.Interpreter.Parse.Static"
 
 
 return Basic.Namespace{

@@ -9,7 +9,7 @@ local PEG = require"Sisyphus2.Structure.Nested.PEG"
 local Variable = PEG.Variable
 
 local Objects = require"Sisyphus2.Interpreter.Objects"
-local Static = Objects.Static
+local Static = require"Sisyphus2.Interpreter.Parse.Static"
 local Construct = Objects.Construct
 
 local Definition = require"Sisyphus2.Grammar.Types.Basic.Template.Definition"

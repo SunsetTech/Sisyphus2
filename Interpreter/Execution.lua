@@ -24,10 +24,10 @@ end
 
 Execution.Resolvable = OOP.Declarator.Shortcuts"Sisyphus2.Interpreter.Execution.Resolvable" --TODO move this into Moonrise.Objects?
 
-function Execution.Resolvable:Initialize(Instance)
+function Execution.Resolvable:Initialize()
 end
 
-function Execution.Resolvable:__call(...) error"Must be implemented" end
+function Execution.Resolvable:__call() error"Must be implemented" end
 
 Execution.Lazy = OOP.Declarator.Shortcuts(
 	"Sisyphus2.Interpreter.Execution.Lazy", {
@@ -36,17 +36,19 @@ Execution.Lazy = OOP.Declarator.Shortcuts(
 )
 
 function Execution.Lazy:Initialize(Instance, Inner, Environment)
-	print("Created ".. tostring(Instance) .." for ".. tostring(Inner))
 	Instance.Inner = Inner
 	Instance.Environment = Environment
 end
 
 function Execution.Lazy:__call()
+	Tools.Debug.Format"Finishing %s"(self)
+	Tools.Debug.Push()
 	local Result = self.Inner(self.Environment)
-	if (OOP.Reflection.Type.Of(Execution.Recursive, Result)) then
+	if (OOP.Reflection.Type.Of(Execution.Recursive, Result)) then --TODO this is a hack and I think wont work right in certain cases
 		Result = Execution.Lazy(Result, self.Environment)
 	end
-	print(self, "got", Result)
+	Tools.Debug.Pop()
+	Tools.Debug.Format"%s -> %s"(self, Result)
 	return Result
 end
 
@@ -83,10 +85,9 @@ Execution.Incomplete = OOP.Declarator.Shortcuts( --TODO this is a hack
 )
 
 function Execution.Incomplete:Initialize(Instance, Arguments, Function)
-
-	print("Created ".. tostring(Instance) .." for ".. tostring(Function))
 	Instance.Arguments = Arguments
 	Instance.Function = Function
+	Tools.Debug.Print("Created ".. tostring(Instance) .." for ".. tostring(Function))
 end
 
 function Execution.ConvertToLazy(Argument, Environment, CurrentArguments)
@@ -130,12 +131,12 @@ Execution.Variable = OOP.Declarator.Shortcuts(
 
 local OldTostring = Execution.Variable.__tostring
 function Execution.Variable:__tostring()
-	return OldTostring(self) .."[".. tostring(self.Location) .."]"
+	return "Variable[".. tostring(self.Location) .."]"
 end
 
 function Execution.Variable:Initialize(Instance, Location)
 	Instance.Location = Location
-	print("Created ".. tostring(Instance) .." for ".. Location)
+	Tools.Debug.Format"Created %s"(Instance)
 end
 
 function Execution.Variable:__call(Environment)
@@ -146,6 +147,7 @@ function Execution.SetVariable(Environment, Parameters, Index, OldValues, Argume
 	local Parameter = Parameters[Index]
 	Environment.Variables[Parameter.Name] = Arguments[Index]
 	OldValues[Parameter.Name] = Environment.Variables[Parameter.Name]
+	Tools.Debug.Format"Set variable %s to %s"(Parameter.Name, Arguments[Index])
 end
 
 function Execution.RestoreVariable(Environment, Parameters, Index, OldValues)
@@ -154,7 +156,10 @@ function Execution.RestoreVariable(Environment, Parameters, Index, OldValues)
 end
 
 function Execution.Invoker(Parameters, Body) --NOTE not sure we can fix this NYI 
-	local New = function(Environment, ...) --TODO make onesided
+	local New = function(Environment, ...) --TODO make onesided. also figure out why Environment is stored in the args table
+		Tools.Debug.Format"Env=%s"(Environment)
+		Tools.Debug.Format"Invoking %s"(Body)
+		Tools.Debug.Push()
 		local Arguments = {...}
 		local OldValues = {}
 		
@@ -179,23 +184,28 @@ function Execution.Invoker(Parameters, Body) --NOTE not sure we can fix this NYI
 		else
 			Execution.RestoreVariable(Environment, Parameters, 1, OldValues)
 		end
-		
+		Tools.Debug.Pop()
+		Tools.Debug.Format"Returning %s from %s"(Returns, Body)
 		return Returns
 	end
-	print("Created invoker_".. tostring(New) .." for ".. tostring(Body))
+	Tools.Debug.Format"Created invoker_%s for %s"(New, Body)
 	return New
 end
 
+local function ArgumentsToString(Arguments)
+	local Parts = {}
+	for k,v in pairs(Arguments) do
+		table.insert(Parts, tostring(v))
+	end
+	return table.concat(Parts, ", ")
+end
 
 Execution.Freeze = function(Function, Arguments)
-	--local Arguments = {...} 
-	
+	Tools.Debug.Format"Checking %s(%s) for frozen elements"(Function, ArgumentsToString(Arguments))
+	Tools.Debug.Push()
 	local Incomplete = false
 	if #Arguments > 1 then
 		for Index = 1, #Arguments do
-			--[[if not Incomplete then 
-				Incomplete = Freeze_LoopBody(Arguments, Index)
-			end]]
 			Incomplete = not Incomplete and Execution.IsResolvable(Arguments, Index) or Incomplete
 		end
 	else
@@ -203,10 +213,13 @@ Execution.Freeze = function(Function, Arguments)
 	end
 	
 	local Return
+	Tools.Debug.Pop()
 	if Incomplete then
 		Return = Execution.Incomplete(Arguments, Function)
+		Tools.Debug.Format"Found frozen elements for %s(%s), froze into %s"(Function,ArgumentsToString(Arguments),Return)
 	else
 		Return = Function(table.unpack(Arguments)) --no incomplete arguments, simply apply and return
+		Tools.Debug.Format"No frozen elements for %s(%s), called and got %s"(Function, ArgumentsToString(Arguments), Return)
 	end
 	return Return
 end;

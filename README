@@ -1,0 +1,40 @@
+Sisyphus: An attempt to produce syntax-safe templating
+
+requires my "Moonrise" library, must be installed in lua path as "Sisyphus2"
+
+Sisyphus is a self-modifying grammar capable of templating any of its own grammar which is not related to the definition of templates.
+Currently however, the grammar isn't much, and to be truly useful it needs to be "bound" to some other language, and a few features on the todo list must be implemented.
+Evaluation is "partialazy", template definitions will be partially evaluated and what cannot be evaluated(due to the presence of variables) will be semi-lazily evaluated at invocation time
+
+Full language is demonstrated through the test files under Grammar/Tests
+Invoke the tests like:
+	lua[jit] Process.lua Path/To/Input Path/To/Output
+
+The interesting bits are under:
+	Interpreter/Execution.lua
+	Interpreter/Parse/Dynamic.lua
+	Grammar/Types/Basic/Template/
+
+Todo:
+	I believe the grammar contains some issues particularly around alias selection
+	Forward declaration and mutual recursion
+	Template overloading?
+	Templated parses (to support a form of specialization for templates)
+	Lazier evaluation
+
+	Templates as structs:
+		Template A<Data.String Argument> Templates.Functions.Join<:Input "!">
+		Template B<A Argument> Templates.Functions.Join<:A.Argument ::A>
+
+	Support for some language as example, probably Lua, maybe C too
+		Templating a language would look like this:
+			Template DefineTestFunction<Lua.Name Name> Lua.Function.Definition function :A() return "Test" end
+			Template ExtractFunctionName<Lua.Function.Definition Function> Lua.Name :Function.Name
+
+	There are some slight bugs I've identified
+	Investigate syntax highlighting, suspect it may not be possible, or not possible safely
+	Far off: Optimize run time, currently abysmal
+	Further off: A compiler (should be possible)
+	Find a better name?
+	Cleanup
+	Description of how execution works

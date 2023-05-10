@@ -16,7 +16,6 @@ function Argument.Resolver(Location)
 		return New]]
 		return Execution.Variable(Location)
 	end
-	print(New)
 	return New
 end
 

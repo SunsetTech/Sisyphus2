@@ -1,4 +1,5 @@
 local Import = require"Toolbox.Import"
+local Tools = require"Moonrise.Tools"
 
 local Structure = require"Sisyphus2.Structure"
 
@@ -9,7 +10,7 @@ local PEG = require"Sisyphus2.Structure.Nested.PEG"
 
 local Objects = require"Sisyphus2.Interpreter.Objects"
 local Syntax = Objects.Syntax
-local Static = Objects.Static
+local Static = require"Sisyphus2.Interpreter.Parse.Static"
 local Parse = Objects.Construct
 local Generate = require"Sisyphus2.Interpreter.Generate"
 local Execution = require"Sisyphus2.Interpreter.Execution"
@@ -48,7 +49,7 @@ function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 								Definition.Arguments(Parameters),
 							}
 						},
-						Execution.NamedFunction("Invoker for ".. Name.Name,  Execution.Invoker(Parameters, Body))
+						Execution.NamedFunction(Name.Name,  Execution.Invoker(Parameters, Body))
 					)
 				),
 				Name
@@ -71,7 +72,7 @@ local function Passthrough(...)
 	return table.unpack(Returns)
 end
 ---@param ... any
-function Definition.Return(...) -- I forget why this was necessary
+function Definition.Return(...) -- I forget why this was necessary. Update: I've almost remembered
 	local New = Execution.Incomplete( {...}, Execution.NamedFunction("Template.Passthrough", Passthrough))
 	return New
 end
@@ -91,7 +92,7 @@ function Definition.GenerateVariables(Parameters)
 				Parameter.Specifier.Target,
 				Aliasable.Type.Definition(
 					PEG.Pattern(Parameter.Name),
-					Execution.NamedFunction("Argument Resolver[".. Parameter.Name .."]", Generate.Argument.Resolver(Parameter.Name))
+					Execution.NamedFunction("Get[".. Parameter.Name .."]", Generate.Argument.Resolver(Parameter.Name))
 				)
 			)
 		);
@@ -119,15 +120,16 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 			function(Environment) 
 				local SavedVariables = {}
 				for K,V in pairs(Environment.Variables) do
-					print(K,V)
 					SavedVariables[K] = V
 				end
 				return Execution.Recursive(
 					function(Body)
-						print(Body)
 						--print("bbb", Body.Resolve.Function)
+						Tools.Debug.Format"Recursing into %s"(Body)
+						Tools.Debug.Push()
 						local Result = Body{Body = Body, Variables = SavedVariables}
-						print("Recursive invocation got", Result)
+						Tools.Debug.Pop()
+						Tools.Debug.Format"Recursive %s got %s"(Body, Result)
 						return Result
 								--return "Lazy Evaluation NYI"--Body(Environment)
 					end

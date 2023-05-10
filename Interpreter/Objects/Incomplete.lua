@@ -2,16 +2,14 @@ local Import = require"Toolbox.Import"
 local Execution = require "Sisyphus2.Interpreter.Execution"
 
 local Structure = require"Sisyphus2.Structure"
-local Object = Structure.Object
 local CanonicalName = Structure.CanonicalName
 local Nested = Structure.Nested
 local PEG = Nested.PEG
-local Variable = PEG.Variable
 local Basic = Structure.Basic
 local Aliasable = Structure.Aliasable
 
 local Construct = Import.Module.Relative"Objects.Construct"
-local Static = Import.Module.Relative"Objects.Static"
+local Static = require"Sisyphus2.Interpreter.Parse.Static"
 local Syntax = Import.Module.Relative"Objects.Syntax"
 
 local OOP = require"Moonrise.OOP"
