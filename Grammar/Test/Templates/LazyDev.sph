@@ -1,6 +1,10 @@
-Templates<
-	Template Recursive<Data.Boolean Argument> Data.String 
+With Templates<
+	Template Recursive<Data.Boolean Argument, Data.String ArgumentA> Data.String 
 		If :Argument 
-			"A" 
-			:Join<"B" :Recursive true>
+			:ArgumentA
+			:Recursive true :ArgumentA
+
+> 
+Templates<
+	Template TestA<Data.Boolean Argument> Data.String :Recursive :Argument "Test"
 >

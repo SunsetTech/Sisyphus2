@@ -1,5 +1,6 @@
 local Tools = require"Moonrise.Tools"
 local Import = require"Moonrise.Import"
+local Execution = require "Sisyphus2.Interpreter.Execution"
 local AliasList = Import.Module.Sister"AliasList"
 local Basic = Import.Module.Relative"Basic"
 local Nested = Import.Module.Relative"Nested"
@@ -15,6 +16,8 @@ local Definition = OOP.Declarator.Shortcuts(
 )
 
 Definition.Initialize = function(_, self, Pattern, Function, Syntax, AliasableTypes, BasicTypes, Aliases)
+	--require"Moonrise.Tools.Debug".PrintStack()
+	--assert(OOP.Reflection.Type.Of(Execution.NamedFunction,Function))
 	self.Pattern = Pattern
 	self.Function = Function
 	self.Syntax = Syntax or Nested.Grammar()

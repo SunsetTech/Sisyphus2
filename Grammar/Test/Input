@@ -4,19 +4,23 @@
 @File"Templates/IfTest.sph"
 @File"Templates/EqualTest.sph"
 @File"Templates/IfEqualTest.sph"
+@File"Templates/LazyDev.sph"
 :Join<
-""::A"1"" 
-"::B"2""
-"::BB<A"D">"
-"::C"3""
-"::ArrayTest<
-	<"blah" ":" "bluh"> 
-	<"A" "=" "B">
->"
-":IfTest<true>"
-":IfTest<false>"
-"If<:EqualTest"A" "1" "2">"
-":IfEqualTest"A""
-":IfEqualTest"B""
-":IfEqualTest"C"
+::A"1" "
+Strings may contain new lines 
+	and tabs
+" ::B"2" "
+" ::BB<A"D"> "
+" ::C"3" " 
+" ::ArrayTest<
+	<"A","=","1"> 
+	<"B" "=" "2">
+> " Arrays must always be surrounded in angle brackets 
+" :IfTest<true> " angle brackets around argument lists are optional 
+" :IfTest false "
+" If<:EqualTest"A" "1", "2"> " Commas are always optional 
+" :IfEqualTest"A" "
+" :IfEqualTest"B" "
+" :IfEqualTest"C" "
+" :TestA false 
 >

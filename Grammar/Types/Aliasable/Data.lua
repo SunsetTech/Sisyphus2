@@ -1,4 +1,5 @@
 local Import = require"Moonrise.Import"
+local Execution = require "Sisyphus2.Interpreter.Execution"
 
 local Structure = require"Sisyphus2.Structure"
 
@@ -59,7 +60,7 @@ local function GenerateArrayType(Canonical, Specifier) -- Generate the match Spe
 			Construct.ArgumentArray(
 				Construct.AliasableType(Specifier.Target:Decompose(true))
 			),
-			Box
+			Execution.NamedFunction("Array.Box",Box)
 		),
 		InstanceName
 	)
@@ -75,12 +76,12 @@ return Aliasable.Namespace {
 			PEG.Sequence{PEG.Pattern"true", PEG.Constant(true)},
 			PEG.Sequence{PEG.Pattern"false", PEG.Constant(false)}
 		},
-		PassThrough
+		Execution.NamedFunction("Boolean.PassThrough",PassThrough)
 	);
 
 	String = Aliasable.Type.Definition(
 		Variable.Child"Syntax",
-		PassThrough,
+		Execution.NamedFunction("String.PassThrough",PassThrough),
 		Nested.Grammar{
 			Delimiter = PEG.Pattern'"';
 			Open = Variable.Sibling"Delimiter";

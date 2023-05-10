@@ -12,6 +12,7 @@ local Syntax = require"Sisyphus2.Interpreter.Objects.Syntax"
 local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 
 local Incomplete = require"Sisyphus2.Interpreter.Objects.Incomplete"
+local Execution = require"Sisyphus2.Interpreter.Execution"
 
 local function CreateNamespaceFor(Entry, Canonical)
 	local Namespace = Aliasable.Namespace()
@@ -39,6 +40,9 @@ local function InvertName(Canonical)
 	return Inverted
 end
 
+local function Equal(LHS, RHS)
+	return Execution.ResolveArgument(LHS) == Execution.ResolveArgument(RHS)
+end
 local function GenerateEqualType(Canonical, Specifier) -- Generate the match Specifier and the Added Types
 	local GeneratedTypes = Aliasable.Namespace()
 
@@ -54,9 +58,7 @@ local function GenerateEqualType(Canonical, Specifier) -- Generate the match Spe
 				Construct.AliasableType(Specifier.Target:Decompose(true)),
 				Construct.AliasableType(Specifier.Target:Decompose(true))
 			},
-			function(LHS, RHS)
-				return LHS == RHS
-			end
+			Execution.NamedFunction("Equal",Equal)
 		),
 		InstanceName
 	)
@@ -73,7 +75,16 @@ return Template.Namespace{
 				PEG.Optional(PEG.Pattern"Join"), 
 				Construct.AliasableType"Data.Array<Data.String>"
 			},
-			table.concat
+			Execution.NamedFunction(
+				"Join", 
+				function(Argument)
+					Argument = Execution.ResolveArgument(Argument)
+					for K,V in pairs(Argument) do
+						Argument[K] = Execution.ResolveArgument(V)
+					end
+					return table.concat(Argument)
+				end
+			)
 		)
 	);
 

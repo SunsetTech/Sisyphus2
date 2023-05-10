@@ -7,12 +7,74 @@ local Vlpeg = require"Sisyphus2.Vlpeg"
 
 local Execution = {}
 
+Execution.NamedFunction = OOP.Declarator.Shortcuts"Sisyphus2.Interpreter.Execution.NamedFunction"
+
+function Execution.NamedFunction:Initialize(Instance, Name, Function)
+	Instance.Name = Name
+	Instance.Function = Function
+end
+
+function Execution.NamedFunction:__call(...)
+	return self.Function(...)
+end
+
+function Execution.NamedFunction:__tostring()
+	return self.Name
+end
+
 Execution.Resolvable = OOP.Declarator.Shortcuts"Sisyphus2.Interpreter.Execution.Resolvable" --TODO move this into Moonrise.Objects?
 
 function Execution.Resolvable:Initialize(Instance)
 end
 
 function Execution.Resolvable:__call(...) error"Must be implemented" end
+
+Execution.Lazy = OOP.Declarator.Shortcuts(
+	"Sisyphus2.Interpreter.Execution.Lazy", {
+		Execution.Resolvable
+	}
+)
+
+function Execution.Lazy:Initialize(Instance, Inner, Environment)
+	print("Created ".. tostring(Instance) .." for ".. tostring(Inner))
+	Instance.Inner = Inner
+	Instance.Environment = Environment
+end
+
+function Execution.Lazy:__call()
+	local Result = self.Inner(self.Environment)
+	if (OOP.Reflection.Type.Of(Execution.Recursive, Result)) then
+		Result = Execution.Lazy(Result, self.Environment)
+	end
+	print(self, "got", Result)
+	return Result
+end
+
+function Execution.ResolveArgument(Argument)
+	while OOP.Reflection.Type.Of(Execution.Lazy, Argument) do
+		Argument = Argument()
+	end
+	
+	return Argument
+end
+
+Execution.Recursive = OOP.Declarator.Shortcuts(
+	"Sisyphus2.Interpreter.Execution.Recursive", {
+		Execution.Resolvable
+	}
+)
+
+function Execution.Recursive:Initialize(Instance, Function)
+	Instance.Function = Function
+end
+
+function Execution.Recursive:__call(Environment)
+	if not Environment then
+		Tools.Debug.PrintStack()
+		assert(Environment)
+	end
+	return self.Function(Environment.Body)
+end
 
 Execution.Incomplete = OOP.Declarator.Shortcuts( --TODO this is a hack
 	"Sisyphus2.Interpreter.Execution.Incomplete", {
@@ -21,19 +83,23 @@ Execution.Incomplete = OOP.Declarator.Shortcuts( --TODO this is a hack
 )
 
 function Execution.Incomplete:Initialize(Instance, Arguments, Function)
+
 	print("Created ".. tostring(Instance) .." for ".. tostring(Function))
 	Instance.Arguments = Arguments
 	Instance.Function = Function
 end
 
-function Execution.ResolveArgument(Argument, Environment, CurrentArguments)
-	local Return
-	if OOP.Reflection.Type.Of(Execution.Resolvable, Argument) then
-		Return = Argument(Environment)
-	else
-		Return = Argument
-	end
-	table.insert(CurrentArguments, Return)
+function Execution.ConvertToLazy(Argument, Environment, CurrentArguments)
+	table.insert(
+		CurrentArguments,
+		(
+			OOP.Reflection.Type.Of(Execution.Incomplete, Argument) 
+			or OOP.Reflection.Type.Of(Execution.Variable, Argument)
+			or OOP.Reflection.Type.Of(Execution.Recursive, Argument)
+		)
+		and Execution.Lazy(Argument, Environment)
+		or Argument
+	)
 end
 
 function Execution.Incomplete:__call(Environment)
@@ -41,10 +107,10 @@ function Execution.Incomplete:__call(Environment)
 	if #self.Arguments > 1 then
 		for Index = 1, #self.Arguments do 
 			local Argument = self.Arguments[Index]
-			Execution.ResolveArgument(Argument, Environment, CurrentArguments)
+			Execution.ConvertToLazy(Argument, Environment, CurrentArguments)
 		end
 	else
-		Execution.ResolveArgument(self.Arguments[1], Environment, CurrentArguments)
+		Execution.ConvertToLazy(self.Arguments[1], Environment, CurrentArguments)
 	end
 	
 	local Return = self.Function(table.unpack(CurrentArguments))
@@ -62,38 +128,43 @@ Execution.Variable = OOP.Declarator.Shortcuts(
 	}
 )
 
+local OldTostring = Execution.Variable.__tostring
+function Execution.Variable:__tostring()
+	return OldTostring(self) .."[".. tostring(self.Location) .."]"
+end
+
 function Execution.Variable:Initialize(Instance, Location)
-	print("Created ".. tostring(Instance) .." for ".. Location)
 	Instance.Location = Location
+	print("Created ".. tostring(Instance) .." for ".. Location)
 end
 
 function Execution.Variable:__call(Environment)
 	return Environment.Variables[self.Location]
 end
 
-local function SetVariable(Environment, Parameters, Index, OldValues, Arguments)
+function Execution.SetVariable(Environment, Parameters, Index, OldValues, Arguments)
 	local Parameter = Parameters[Index]
 	Environment.Variables[Parameter.Name] = Arguments[Index]
 	OldValues[Parameter.Name] = Environment.Variables[Parameter.Name]
 end
 
-local function RestoreVariable(Environment, Parameters, Index, OldValues)
+function Execution.RestoreVariable(Environment, Parameters, Index, OldValues)
 	local Parameter = Parameters[Index]
 	Environment.Variables[Parameter.Name] = OldValues[Parameter.Name]
 end
 
 function Execution.Invoker(Parameters, Body) --NOTE not sure we can fix this NYI 
-	local New = function(Environment, ...)
+	local New = function(Environment, ...) --TODO make onesided
 		local Arguments = {...}
 		local OldValues = {}
 		
 		--for Index, Parameter in pairs(Parameters) do
 		if #Parameters > 1 then
 			for Index = 1,#Parameters do
-				SetVariable(Environment, Parameters, Index, OldValues, Arguments)
+				Execution.SetVariable(Environment, Parameters, Index, OldValues, Arguments)
 			end
 		else
-			SetVariable(Environment, Parameters, 1, OldValues, Arguments)
+			Execution.SetVariable(Environment, Parameters, 1, OldValues, Arguments)
 		end
 		
 		local LastBody = Environment.Body
@@ -103,10 +174,10 @@ function Execution.Invoker(Parameters, Body) --NOTE not sure we can fix this NYI
 
 		if #Parameters > 1 then
 			for Index = 1,#Parameters do
-				RestoreVariable(Environment, Parameters, Index, OldValues)
+				Execution.RestoreVariable(Environment, Parameters, Index, OldValues)
 			end
 		else
-			RestoreVariable(Environment, Parameters, 1, OldValues)
+			Execution.RestoreVariable(Environment, Parameters, 1, OldValues)
 		end
 		
 		return Returns

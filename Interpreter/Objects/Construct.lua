@@ -8,7 +8,7 @@ local PEG = Structure.Nested.PEG
 local Variable = PEG.Variable
 
 local Syntax = Import.Module.Sister"Syntax"
-local Static = Import.Module.Sister"Static"
+local Static = require"Sisyphus2.Interpreter.Parse.Static"
 
 local Package
 

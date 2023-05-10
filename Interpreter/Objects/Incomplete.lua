@@ -1,4 +1,5 @@
 local Import = require"Toolbox.Import"
+local Execution = require "Sisyphus2.Interpreter.Execution"
 
 local Structure = require"Sisyphus2.Structure"
 local Object = Structure.Object
@@ -34,7 +35,12 @@ local function Generate(Specifier, GeneratedTypes, Environment)
 end
 
 local function Passthrough(...)
-	return ...
+	local Args = {...}
+	local Returns = {}
+	for k,v in pairs(Args) do
+		Returns[k] = Execution.ResolveArgument(v)
+	end
+	return table.unpack(Returns)
 end
 
 local Decompose = function(self)
@@ -51,7 +57,7 @@ local Decompose = function(self)
 				Generate
 			)
 		),
-		Passthrough,
+		Execution.NamedFunction("Incomplete.Passthrough",Passthrough),
 		self.Syntax,
 		self.AliasableTypes,
 		self.BasicTypes,

@@ -10,14 +10,20 @@ local Variable = PEG.Variable
 local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 local Syntax = require"Sisyphus2.Interpreter.Objects.Syntax"
 local Static = require"Sisyphus2.Interpreter.Objects.Static"
+local Execution = require"Sisyphus2.Interpreter.Execution"
 
-local function Compare(Switch, Left, Right)
-	return 
-		Switch
+local function Branch(Switch, Left, Right)
+	if Execution.ResolveArgument(Switch) then
+		return Execution.ResolveArgument(Left)
+	else
+		return Execution.ResolveArgument(Right)
+	end
+	--[[return 
+		Execution.Switch
 		and Left
-		or Right
+		or Right]]
 end
-
+print("Branch = ".. tostring(Branch))
 return Basic.Type.Set{
 	If = Basic.Type.Definition(
 		Syntax.Tokens{
@@ -37,7 +43,7 @@ return Basic.Type.Set{
 								Construct.AliasableType(Basetype),
 								Construct.AliasableType(Basetype)
 							}, 
-							Compare
+							Execution.NamedFunction("Branch",Branch)
 						)/"Nested.Grammar"
 						
 						return GrammarCopy

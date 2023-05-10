@@ -48,7 +48,7 @@ function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 								Definition.Arguments(Parameters),
 							}
 						},
-						Execution.Invoker(Parameters, Body)
+						Execution.NamedFunction("Invoker for ".. Name.Name,  Execution.Invoker(Parameters, Body))
 					)
 				),
 				Name
@@ -63,11 +63,16 @@ end
 
 ---fuck how do we even annotate this
 local function Passthrough(...)
-	return ...
+	local Args = {...}
+	local Returns = {}
+	for k,v in pairs(Args) do
+		Returns[k] = Execution.ResolveArgument(v)
+	end
+	return table.unpack(Returns)
 end
 ---@param ... any
 function Definition.Return(...) -- I forget why this was necessary
-	local New = Execution.Incomplete( {...}, Passthrough)
+	local New = Execution.Incomplete( {...}, Execution.NamedFunction("Template.Passthrough", Passthrough))
 	return New
 end
 
@@ -86,7 +91,7 @@ function Definition.GenerateVariables(Parameters)
 				Parameter.Specifier.Target,
 				Aliasable.Type.Definition(
 					PEG.Pattern(Parameter.Name),
-					Generate.Argument.Resolver(Parameter.Name)
+					Execution.NamedFunction("Argument Resolver[".. Parameter.Name .."]", Generate.Argument.Resolver(Parameter.Name))
 				)
 			)
 		);
@@ -117,16 +122,14 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 					print(K,V)
 					SavedVariables[K] = V
 				end
-				return Execution.Resolvable(
-					function(Environment)
-						local Body = Environment.Body
+				return Execution.Recursive(
+					function(Body)
+						print(Body)
 						--print("bbb", Body.Resolve.Function)
-						return Execution.Resolvable(
-							function()
-								return Body{Body = Body, Variables = SavedVariables}
+						local Result = Body{Body = Body, Variables = SavedVariables}
+						print("Recursive invocation got", Result)
+						return Result
 								--return "Lazy Evaluation NYI"--Body(Environment)
-							end
-						)
 					end
 				) 
 			end

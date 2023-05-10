@@ -1,6 +1,6 @@
 local Import = require"Moonrise.Import"
 
-local Transform = require"Sisyphus2.Interpreter.Execution"
+local Execution = require"Sisyphus2.Interpreter.Execution"
 
 local OOP = require"Moonrise.OOP"
 
@@ -11,7 +11,7 @@ local Completable = OOP.Declarator.Shortcuts(
 )
 
 local Decompose = function(self, Canonical)
-	local Decomposed = Transform.Completable(
+	local Decomposed = Execution.Completable(
 		self.Pattern:Decompose(Canonical), 
 		self.Function
 	)
@@ -24,6 +24,7 @@ local Copy = function(self)
 end; Completable.Copy = Copy;
 
 Completable.Initialize = function(_, self, Pattern, Function)
+
 	self.Pattern = Pattern
 	self.Function = Function
 	self.Decompose = Decompose
