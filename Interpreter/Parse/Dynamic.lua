@@ -7,8 +7,6 @@ local Static = require"Sisyphus2.Interpreter.Parse.Static"
 
 local Count = 0
 local function JumpToGrammar(Subject, StartPosition, Grammar, ...)
-	Count = Count + 1
-	print("JumpToGrammar", Count)
 	local EndPosition, Returns = Vlpeg.Match(
 		Vlpeg.Apply(
 			Vlpeg.Sequence(
@@ -39,7 +37,7 @@ Dynamic = {
 		return New
 	end;
 	
-	Aliasable = function(Pattern) --matches Pattern which should produce an Aliasable.Grammar, then return it and a copy of the current state to Jump
+	Grammar = function(Pattern) --matches Pattern which should produce an Aliasable.Grammar, then return it and a copy of the current state to Jump
 		local New = Dynamic.Jump(
 			PEG.Apply(
 				PEG.Sequence{Pattern, Static.GetEnvironment}, SetGrammar

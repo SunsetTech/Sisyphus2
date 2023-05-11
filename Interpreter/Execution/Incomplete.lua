@@ -6,7 +6,7 @@ local Recursive = require"Sisyphus2.Interpreter.Execution.Recursive"
 local Variable = require"Sisyphus2.Interpreter.Execution.Variable"
 
 local Incomplete = OOP.Declarator.Shortcuts( --TODO this is a hack
-	"Sisyphus2.Interpreter.Execution.Incomplete", {
+	"Incomplete", {
 		require"Sisyphus2.Interpreter.Execution.Resolvable"
 	}
 )
@@ -18,16 +18,14 @@ function Incomplete:Initialize(Instance, Arguments, Function)
 end
 
 local function ConvertToLazy(Argument, Environment, CurrentArguments)
-	table.insert(
-		CurrentArguments,
-		(
-			OOP.Reflection.Type.Of(Incomplete, Argument) 
-			or OOP.Reflection.Type.Of(Variable, Argument)
-			or OOP.Reflection.Type.Of(Recursive, Argument)
-		)
-		and Lazy(Argument, Environment)
-		or Argument
-	)
+	if (
+		OOP.Reflection.Type.Of(Incomplete, Argument) 
+		or OOP.Reflection.Type.Of(Variable, Argument)
+		or OOP.Reflection.Type.Of(Recursive, Argument)
+	) then
+		Argument = Lazy(Argument, Environment)
+	end
+	table.insert( CurrentArguments, Argument)
 end
 
 function Incomplete:__call(Environment)
@@ -45,6 +43,7 @@ function Incomplete:__call(Environment)
 	
 	local Return = self.Function(table.unpack(CurrentArguments))
 	Tools.Debug.Pop()
+	Tools.Debug.Format"%s->%s"(self.Function, Return)
 	return Return
 end
 

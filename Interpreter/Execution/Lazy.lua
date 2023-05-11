@@ -3,7 +3,7 @@ local OOP = require"Moonrise.OOP"
 local Recursive = require"Sisyphus2.Interpreter.Execution.Recursive"
 
 Lazy = OOP.Declarator.Shortcuts(
-	"Sisyphus2.Interpreter.Execution.Lazy", {
+	"Lazy", {
 		require"Sisyphus2.Interpreter.Execution.Resolvable"
 	}
 )

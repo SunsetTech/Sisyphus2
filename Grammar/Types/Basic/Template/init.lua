@@ -14,11 +14,12 @@ local Construct = Objects.Construct
 
 local Definition = require"Sisyphus2.Grammar.Types.Basic.Template.Definition"
 local TypeSpecifier = require"Sisyphus2.Grammar.Types.Basic.Template.TypeSpecifier"
+local Dynamic = require"Sisyphus2.Interpreter.Parse.Dynamic"
 
 return Basic.Namespace{
 	TypeSpecifier = Basic.Type.Definition(
 		PEG.Apply(
-			Construct.ChangeGrammar(
+			Dynamic.Grammar(
 				PEG.Apply(
 					PEG.Sequence{
 						Variable.Canonical"Types.Basic.Name.Target",
@@ -58,7 +59,7 @@ return Basic.Namespace{
 	);
 
 	Declaration = Basic.Type.Definition(
-		Construct.ChangeGrammar(
+		Dynamic.Grammar(
 			Construct.Invocation(
 				"Template",
 				Construct.ArgumentList{

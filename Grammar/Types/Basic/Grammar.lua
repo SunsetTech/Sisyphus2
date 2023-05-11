@@ -12,11 +12,12 @@ local PEG = Structure.Nested.PEG
 local Variable = PEG.Variable
 
 local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
+local Dynamic = require"Sisyphus2.Interpreter.Parse.Dynamic"
 
 return Basic.Type.Set{
 	Modifier = Basic.Type.Set{
 		Using = Basic.Type.Definition( --broken
-			Construct.DynamicParse(
+			Dynamic.Jump(
 				Construct.Invocation(
 					"Using",
 					Construct.ArgumentList{Variable.Canonical"Types.Basic.Name.Target"},
@@ -48,7 +49,7 @@ return Basic.Type.Set{
 
 		--Templated parse that takes a Grammar.Modifier and uses the new grammar to match and return a.. Grammar.Modifier.
 		With = Basic.Type.Definition(
-			Construct.DynamicParse(
+			Dynamic.Jump(
 				Construct.Invocation(
 					"With",
 					Construct.ArgumentList{Variable.Canonical"Types.Basic.Grammar.Modifier"},

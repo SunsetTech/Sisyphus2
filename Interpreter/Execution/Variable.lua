@@ -2,7 +2,7 @@ local OOP = require"Moonrise.OOP"
 local Tools = require"Moonrise.Tools"
 
 Variable = OOP.Declarator.Shortcuts(
-	"Sisyphus2.Interpreter.Execution.Variable", {
+	"Variable", {
 		require"Sisyphus2.Interpreter.Execution.Resolvable"
 	}
 )

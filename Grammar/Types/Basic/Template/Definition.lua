@@ -115,7 +115,7 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 			CurrentGrammar.Information
 		),
 		VariablesNamespace + Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)( --Recursion
-			function(Environment) 
+			Execution.NamedFunction("Recursive_".. Name:Decompose(), function(Environment) 
 				--[[for K,V in pairs(Environment.Variables) do
 					SavedVariables[K] = V
 				end]]
@@ -131,7 +131,7 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 								--return "Lazy Evaluation NYI"--Body(Environment)
 					end
 				) 
-			end
+			end)
 		)
 	)
 	DefinitionGrammar = DefinitionGrammar/"Aliasable.Grammar"

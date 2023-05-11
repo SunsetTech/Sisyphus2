@@ -10,6 +10,7 @@ local Aliasable = Structure.Aliasable
 
 local Construct = Import.Module.Relative"Objects.Construct"
 local Static = require"Sisyphus2.Interpreter.Parse.Static"
+local Dynamic = require"Sisyphus2.Interpreter.Parse.Dynamic"
 local Syntax = Import.Module.Relative"Objects.Syntax"
 
 local OOP = require"Moonrise.OOP"
@@ -43,7 +44,7 @@ end
 
 local Decompose = function(self)
 	local Decomposed = Aliasable.Type.Definition(
-		Construct.ChangeGrammar(
+		Dynamic.Grammar(
 			PEG.Apply(
 				PEG.Sequence{
 					Syntax.Tokens{

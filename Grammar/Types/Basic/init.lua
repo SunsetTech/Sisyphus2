@@ -6,6 +6,7 @@ local PEG = Structure.Nested.PEG
 local Variable = PEG.Variable
 
 local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
+local Dynamic = require"Sisyphus2.Interpreter.Parse.Dynamic"
 
 return Basic.Namespace{
 	Name = Module.Child"Name";
@@ -14,7 +15,7 @@ return Basic.Namespace{
 	Root = Module.Child"Root";
 
 	Modified = Basic.Type.Definition(
-		Construct.DynamicParse(
+		Dynamic.Jump(
 			Construct.Invocation( 
 				"@",
 				Construct.ArgumentList{Variable.Canonical"Types.Basic.Grammar.Modifier"},

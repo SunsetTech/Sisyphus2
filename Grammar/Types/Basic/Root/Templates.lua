@@ -5,12 +5,12 @@ local Aliasable = Structure.Aliasable
 local Basic = Structure.Basic
 local Nested = Structure.Nested
 local PEG = Nested.PEG
-local Variable = PEG.Variable
 
 local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 local Syntax = require"Sisyphus2.Interpreter.Objects.Syntax"
 local Static = require"Sisyphus2.Interpreter.Parse.Static"
 local Execution = require"Sisyphus2.Interpreter.Execution"
+local Dynamic = require"Sisyphus2.Interpreter.Parse.Dynamic"
 
 local function Branch(Switch, Left, Right)
 	if Execution.ResolveArgument(Switch) then
@@ -28,7 +28,7 @@ return Basic.Type.Set{
 	If = Basic.Type.Definition(
 		Syntax.Tokens{
 			PEG.Pattern"If",
-			Construct.ChangeGrammar(
+			Dynamic.Grammar(
 				PEG.Apply(
 					PEG.Sequence{
 						PEG.Stored"Basetype",

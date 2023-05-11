@@ -8,7 +8,6 @@
 :Join<
 ::A"1" "
 Strings may contain new lines 
-	and tabs
 " ::B"2" "
 " ::BB<A"D"> "
 " ::C"3" " 

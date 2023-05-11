@@ -1,5 +1,5 @@
 local OOP = require"Moonrise.OOP"
-local Resolvable = OOP.Declarator.Shortcuts"Sisyphus2.Interpreter.Execution.Resolvable" --TODO move this into Moonrise.Objects?
+local Resolvable = OOP.Declarator.Shortcuts"Resolvable" --TODO move this into Moonrise.Objects?
 
 function Resolvable:Initialize()
 end

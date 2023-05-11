@@ -38,11 +38,15 @@ local function SetGrammar(NewGrammar, Environment)
 end
 Package = {
 	DynamicParse = function(Pattern) --Matches Pattern which should produce an lpeg grammar/pattern and any number of arguments, then jumps to the returned grammar at the current position
+		Tools.Debug.PrintStack()
+		error"?"
 		local New = PEG.Immediate(Pattern, JumpToGrammar)
 		return New
 	end;
 	
 	ChangeGrammar = function(Pattern) --matches Pattern which should produce an Aliasable.Grammar, then return it and a copy of the current state to DynamicParse
+		Tools.Debug.PrintStack()
+		error"?"
 		local New = Package.DynamicParse(
 			PEG.Apply(
 				PEG.Sequence{Pattern, Static.GetEnvironment}, SetGrammar

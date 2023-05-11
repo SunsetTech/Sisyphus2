@@ -1,2 +1,2 @@
 @File"Templates/LazyDev.sph"
-:TestA false
+:Recursive<false "Test">

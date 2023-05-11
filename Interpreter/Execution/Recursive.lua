@@ -1,7 +1,7 @@
 local Tools = require"Moonrise.Tools"
 local OOP = require"Moonrise.OOP"
 Recursive = OOP.Declarator.Shortcuts(
-	"Sisyphus2.Interpreter.Execution.Recursive", {
+	"Recursive", {
 		require"Sisyphus2.Interpreter.Execution.Resolvable"
 	}
 )
