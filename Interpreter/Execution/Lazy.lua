@@ -18,7 +18,9 @@ function Lazy:__call()
 	Tools.Debug.Push()
 	local Result = self.Inner(self.Environment)
 	if (OOP.Reflection.Type.Of(Recursive, Result)) then --TODO this is a hack and I think wont work right in certain cases
-		Result = Lazy(Result, self.Environment)
+		local Replacement = Lazy(Result, self.Environment)
+		Tools.Debug.Format"HACK %s->%s"(Result, Replacement)
+		Result = Replacement
 	end
 	Tools.Debug.Pop()
 	Tools.Debug.Format"%s -> %s"(self, Result)

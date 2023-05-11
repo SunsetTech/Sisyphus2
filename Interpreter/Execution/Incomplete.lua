@@ -5,11 +5,27 @@ local Lazy = require"Sisyphus2.Interpreter.Execution.Lazy"
 local Recursive = require"Sisyphus2.Interpreter.Execution.Recursive"
 local Variable = require"Sisyphus2.Interpreter.Execution.Variable"
 
+local function ArgumentsToString(Arguments)
+	local Parts = {}
+	--for k,v in pairs(Arguments) do
+	for Index = 1, #Arguments do
+		local v = Arguments[Index]
+		table.insert(Parts, tostring(v))
+	end
+	return table.concat(Parts, ", ")
+end
+
 local Incomplete = OOP.Declarator.Shortcuts( --TODO this is a hack
 	"Incomplete", {
 		require"Sisyphus2.Interpreter.Execution.Resolvable"
 	}
 )
+
+local OldTostring = Incomplete.__tostring
+
+function Incomplete:__tostring()
+	return tostring(self.Function) ..'('.. ArgumentsToString(self.Arguments) ..")"
+end
 
 function Incomplete:Initialize(Instance, Arguments, Function)
 	Instance.Arguments = Arguments

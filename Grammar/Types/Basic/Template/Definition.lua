@@ -36,6 +36,7 @@ end
 --Parses the template grammar for the newly defined template
 function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 	local New = function(Body)
+		Tools.Debug.Format"function %s() return %s end"(Name:Decompose(), Body)
 		local New = Generate.Namespace.Template(
 				Template.Definition(
 					Basetype,

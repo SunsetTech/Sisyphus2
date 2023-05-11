@@ -7,5 +7,5 @@ With Templates<
 > 
 Templates<
 	Template TestA<Data.Boolean Argument> Data.String :Recursive :Argument "Test"
-	Template TestB<Data.Boolean Argument> Data.String If :Argument "aaaa" "bbbb"
+	Template NonRecursive<Data.Boolean Argument> Data.String If :Argument "aaaa" "bbbb"
 >
