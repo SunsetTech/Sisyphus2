@@ -11,11 +11,12 @@ Invoke the tests like:
 	lua[jit] Process.lua Path/To/Input Path/To/Output
 
 The interesting bits are under:
-	Interpreter/Execution.lua
+	Interpreter/Execution/
 	Interpreter/Parse/Dynamic.lua
 	Grammar/Types/Basic/Template/
 
 Todo:
+	Change the alias selection character, : is a bit ugly
 	Syntax error reporting (might be hard)
 	I believe the grammar contains some issues particularly around alias selection
 	Forward declaration and mutual recursion
@@ -39,9 +40,9 @@ Todo:
 
 				
 	There are some slight bugs I've identified
-	Investigate syntax highlighting, suspect it may not be possible, or not possible safely
-	Far off: Optimize run time, currently abysmal
-		A major problem is the amount of objects created. the main test case "Input" consumres hundreds of MB with the GC off
+	Far off: Investigate syntax highlighting, suspect it may not be possible, or not possible safely
+	Far off: Optimize run time, currently abysmal, approx 400ms on dev machine
+		A major problem is the amount of objects created. the main test case "Input" consumes 100+ MB with the GC off
 	Further off: A compiler (should be possible, naively we could compile template definitions to Lua)
 	Find a better name?
 	Cleanup

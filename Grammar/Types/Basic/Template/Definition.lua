@@ -40,16 +40,13 @@ function Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)
 				Template.Definition(
 					Basetype,
 					Aliasable.Type.Definition(
-						PEG.Sequence{
-							Static.GetEnvironment,
-							Syntax.Tokens{
-								PEG.Optional(
-									PEG.Pattern(Name.Name)
-								),
-								Definition.Arguments(Parameters),
-							}
+						Syntax.Tokens{
+							PEG.Optional(
+								PEG.Pattern(Name.Name)
+							),
+							Definition.Arguments(Parameters),
 						},
-						Execution.NamedFunction(Name.Name,  Execution.Invoker(Parameters, Body))
+						Execution.NamedFunction(Name:Decompose(),  Execution.Invoker(Parameters, Body))
 					)
 				),
 				Name
@@ -72,9 +69,10 @@ local function Passthrough(...)
 	return table.unpack(Returns)
 end
 ---@param ... any
-function Definition.Return(...) -- I forget why this was necessary. Update: I've almost remembered
-	local New = Execution.Incomplete( {...}, Execution.NamedFunction("Template.Passthrough", Passthrough))
-	return New
+function Definition.Return(...) -- I forget why this was necessary. Update: I've almost remembered. Update: it didnt seem to be actually necessary
+	--[[local New = Execution.Incomplete( {...}, Execution.NamedFunction("Template.Passthrough", Passthrough))
+	return New]]
+	return ...
 end
 
 function Definition.GenerateVariables(Parameters)
@@ -118,16 +116,15 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 		),
 		VariablesNamespace + Definition.Finish(Basetype, Name, Parameters, GeneratedTypes)( --Recursion
 			function(Environment) 
-				local SavedVariables = {}
-				for K,V in pairs(Environment.Variables) do
+				--[[for K,V in pairs(Environment.Variables) do
 					SavedVariables[K] = V
-				end
+				end]]
 				return Execution.Recursive(
 					function(Body)
 						--print("bbb", Body.Resolve.Function)
 						Tools.Debug.Format"Recursing into %s"(Body)
 						Tools.Debug.Push()
-						local Result = Body{Body = Body, Variables = SavedVariables}
+						local Result = Body{Body = Body, Variables = Environment.Variables}
 						Tools.Debug.Pop()
 						Tools.Debug.Format"Recursive %s got %s"(Body, Result)
 						return Result
