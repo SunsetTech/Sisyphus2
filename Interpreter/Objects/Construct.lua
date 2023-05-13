@@ -1,7 +1,5 @@
-local Tools = require"Toolbox.Tools"
 local Import = require"Toolbox.Import"
 
-local Vlpeg = require"Sisyphus2.Vlpeg"
 local Structure = require"Sisyphus2.Structure"
 local CanonicalName = Structure.CanonicalName
 local PEG = Structure.Nested.PEG
@@ -12,49 +10,7 @@ local Static = require"Sisyphus2.Interpreter.Parse.Static"
 
 local Package
 
-local function JumpToGrammar(Subject, Position, Grammar, ...)
-	local Position, Returns = Vlpeg.Match(
-		Vlpeg.Apply(
-			Vlpeg.Sequence(
-				Tools.Error.NotMine(Vlpeg.Table,Grammar), 
-				Vlpeg.Position()
-			),
-			function(Returns, Position)
-				return Position, Returns
-			end
-		),
-		Subject, Position, ...
-	)
-	return Position, table.unpack(Returns or {})
-end
-local function SetGrammar(NewGrammar, Environment)
-	--Tools.Error.CallerAssert(NewGrammar%"Aliasable.Grammar")
-	local New = NewGrammar/"userdata"
-	return 
-		New, {
-			Grammar = NewGrammar;
-			Variables = Tools.Table.Copy(Environment.Variables);
-		}
-end
 Package = {
-	DynamicParse = function(Pattern) --Matches Pattern which should produce an lpeg grammar/pattern and any number of arguments, then jumps to the returned grammar at the current position
-		Tools.Debug.PrintStack()
-		error"?"
-		local New = PEG.Immediate(Pattern, JumpToGrammar)
-		return New
-	end;
-	
-	ChangeGrammar = function(Pattern) --matches Pattern which should produce an Aliasable.Grammar, then return it and a copy of the current state to DynamicParse
-		Tools.Debug.PrintStack()
-		error"?"
-		local New = Package.DynamicParse(
-			PEG.Apply(
-				PEG.Sequence{Pattern, Static.GetEnvironment}, SetGrammar
-			)
-		)
-		return New
-	end;
-
 	Invocation = function(Disambiguator, Pattern, Function)
 		local New = PEG.Apply(
 			PEG.Sequence{

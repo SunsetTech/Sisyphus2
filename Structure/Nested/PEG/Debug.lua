@@ -27,7 +27,7 @@ function Debug:Decompose(Canonical)
 				end
 			),
 			Vlpeg.Immediate(
-				self.SubPattern(Canonical),
+				self.SubPattern:Decompose(Canonical),
 				function(_,Pos,...)
 					Tools.Debug.Print("<-", ...)
 					return Pos, ...

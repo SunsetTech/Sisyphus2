@@ -18,12 +18,15 @@ local function Decompose(self)
 	return Decomposed
 end; Grammar.Decompose = Decompose
 
+local Add = OrderedMap.Add
+local GetPair = OrderedMap.GetPair
+
 ---@param self Sisyphus2.Structure.Flat.Grammar
 local function Copy(self)
 	local Rules = OrderedMap()
 	for Index = 1, self.Rules:NumKeys() do
 		--local Name, Rule = self.Rules:GetPair(Index)
-		Rules:Add(self.Rules:GetPair(Index))
+		Add(Rules, self.Rules:GetPair(Index))
 	end
 	local New = Grammar(nil, Rules)
 	return New
@@ -41,7 +44,7 @@ end; Grammar.SetRule = SetRule
 local function Merge(self, From)
 	for Index = 1, From.Rules:NumKeys() do
 		--local Name, Rule = From.Rules:GetPair(Index)
-		self.Rules:Add(From.Rules:GetPair(Index))
+		Add(self.Rules, GetPair(From.Rules, Index))
 	end
 end; Grammar.Merge = Merge
 

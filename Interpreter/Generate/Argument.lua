@@ -1,21 +1,13 @@
 local Execution = require"Sisyphus2.Interpreter.Execution"
 
-local Argument = {}
-
-local __call = function(self, Environment)
-	return Environment.Variables[self.Location]
+local function __call(self)
+	return Execution.Variable(self.Location)
 end
 
-local MT = {__call=__call}
+local Argument = {}
 
 function Argument.Resolver(Location)
-	local New = function()
-		--[[local New = Execution.Resolvable(
-			setmetatable({Location=Location},MT)
-		)
-		return New]]
-		return Execution.Variable(Location)
-	end
+	local New = setmetatable({Location = Location},{__call=__call})
 	return New
 end
 

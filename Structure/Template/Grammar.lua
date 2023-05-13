@@ -13,6 +13,7 @@ local function LookupAliasableType(In, Canonical)
 			local Found = LookupAliasableType(In.Children.Entries:Get(Canonical.Name), Canonical.Namespace)
 			return Found
 		else
+			error"Should be an Aliasable.Namespace"
 		end
 	else
 		return In

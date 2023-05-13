@@ -1,7 +1,5 @@
-local Module = require"Toolbox.Import.Module"
-
-return {
-	Basic = Module.Child"Basic";
-	Aliasable = Module.Child"Aliasable";
-	Templates = Module.Child"Templates";
-}
+local Types; Types= {
+	Basic = require"Sisyphus2.Grammar.Types.Basic";
+	Aliasable = require"Sisyphus2.Grammar.Types.Aliasable";
+	Templates = require"Sisyphus2.Grammar.Types.Templates";
+}; return Types;

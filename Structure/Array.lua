@@ -7,16 +7,11 @@ local Array = OOP.Declarator.Shortcuts(
 )
 
 local Decompose = function(self, Argument)
-	--[[local Count = select("#", ...)
-	print(Count)
-	local Args = {...}]]
 	local Decomposed = {}
 	
 	for Index = 1, #self.Items do
 		local Item = self.Items[Index]
-		--Tools.Error.CallerAssert(type(Index) == "number", "Expected a numeric index, got ".. Index)
-		--Tools.Error.CallerAssert(Item%(self.Type), "Expected a ".. self.Type)
-	
+
 		Decomposed[Index] = Item:Decompose(Argument)
 	end
 
@@ -27,8 +22,7 @@ local Copy = function(self)
 	local ItemsCopy = {}
 	
 	for Index = 1, #self.Items do
-		local Item = self.Items[Index]
-		ItemsCopy[Index] = Item:Copy()
+		ItemsCopy[Index] = self.Items[Index]:Copy()
 	end
 	
 	local New = Array(self.Type, ItemsCopy)

@@ -1,7 +1,7 @@
 local Tools = require"Moonrise.Tools"
 local OOP = require"Moonrise.OOP"
 
-local Lazy = require"Sisyphus2.Interpreter.Execution.Lazy"
+local Unboxer = require"Sisyphus2.Interpreter.Execution.Unboxer"
 local Recursive = require"Sisyphus2.Interpreter.Execution.Recursive"
 local Variable = require"Sisyphus2.Interpreter.Execution.Variable"
 
@@ -24,7 +24,7 @@ local Incomplete = OOP.Declarator.Shortcuts( --TODO this is a hack
 local OldTostring = Incomplete.__tostring
 
 function Incomplete:__tostring()
-	return tostring(self.Function) ..'('.. ArgumentsToString(self.Arguments) ..")"
+	return OldTostring(self) .."<".. tostring(self.Function) ..'('.. ArgumentsToString(self.Arguments) ..")" ..">"
 end
 
 function Incomplete:Initialize(Instance, Arguments, Function)
@@ -33,13 +33,17 @@ function Incomplete:Initialize(Instance, Arguments, Function)
 	Tools.Debug.Print("Created ".. tostring(Instance) .." for ".. tostring(Function))
 end
 
-local function ConvertToLazy(Argument, Environment, CurrentArguments)
+local function Complete(Argument, Environment, CurrentArguments)
 	if (
 		OOP.Reflection.Type.Of(Incomplete, Argument) 
 		or OOP.Reflection.Type.Of(Variable, Argument)
 		or OOP.Reflection.Type.Of(Recursive, Argument)
+		or OOP.Reflection.Type.Of(Unboxer, Argument)
 	) then
-		Argument = Lazy(Argument, Environment)
+		--local Replacement = Lazy(Argument, Environment)
+		Replacement = Argument(Environment)
+		Tools.Debug.Format"Complete %s->%s"(Argument, Replacement)
+		Argument = Replacement
 	end
 	table.insert( CurrentArguments, Argument)
 end
@@ -51,10 +55,10 @@ function Incomplete:__call(Environment)
 	if #self.Arguments > 1 then
 		for Index = 1, #self.Arguments do 
 			local Argument = self.Arguments[Index]
-			ConvertToLazy(Argument, Environment, CurrentArguments)
+			Complete(Argument, Environment, CurrentArguments)
 		end
 	else
-		ConvertToLazy(self.Arguments[1], Environment, CurrentArguments)
+		Complete(self.Arguments[1], Environment, CurrentArguments)
 	end
 	
 	local Return = self.Function(table.unpack(CurrentArguments))

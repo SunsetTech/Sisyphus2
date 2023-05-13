@@ -1,18 +1,16 @@
-local Import = require"Moonrise.Import"
 local Execution = require "Sisyphus2.Interpreter.Execution"
 
 local Structure = require"Sisyphus2.Structure"
-
-local CanonicalName = Structure.CanonicalName
-local Aliasable = Structure.Aliasable
-local Nested = Structure.Nested
-local PEG = Nested.PEG
+local PEG = Structure.Nested.PEG
 local Variable = PEG.Variable
 
 local Construct = require"Sisyphus2.Interpreter.Objects.Construct"
 local Incomplete = require"Sisyphus2.Interpreter.Objects.Incomplete"
+
+local Box = require"Sisyphus2.Interpreter.Execution.Box"
+
 local function CreateNamespaceFor(Entry, Canonical)
-	local Namespace = Aliasable.Namespace()--[[{
+	local Namespace = Structure.Aliasable.Namespace()--[[{
 		[Canonical.Name] = Entry;
 	}]]
 	Namespace.Children.Entries:Add(Canonical.Name, Entry)
@@ -37,8 +35,13 @@ local function InvertName(Canonical)
 	return Inverted
 end
 
-local function Box(...)
-	return {...}
+local function ArrayBoxer(...)
+	local Arguments = {...}
+	local Array = {}
+	for Index = 1, #Arguments do
+		Array[Index] = Execution.ResolveArgument(Arguments[Index])
+	end
+	return Array
 end
 
 local function PassThrough(...)
@@ -46,21 +49,21 @@ local function PassThrough(...)
 end
 
 local function GenerateArrayType(Canonical, Specifier) -- Generate the match Specifier and the Added Types
-	local GeneratedTypes = Aliasable.Namespace()
+	local GeneratedTypes = Structure.Aliasable.Namespace()
 
 	if Specifier.GeneratedTypes then
 		GeneratedTypes = GeneratedTypes + Specifier.GeneratedTypes
 	end
 	
 	
-	local InstanceName = CanonicalName(Canonical.Name .."<".. Specifier.Target:Decompose(true) ..">", Canonical.Namespace)
+	local InstanceName = Structure.CanonicalName(Canonical.Name .."<".. Specifier.Target:Decompose(true) ..">", Canonical.Namespace)
 	
 	local Namespace = CreateNamespaceFor(
-		Aliasable.Type.Definition(
+		Structure.Aliasable.Type.Definition(
 			Construct.ArgumentArray(
 				Construct.AliasableType(Specifier.Target:Decompose(true))
 			),
-			Execution.NamedFunction("Array.Box",Box)
+			Execution.NamedFunction("Array.ArrayBoxer",Box)
 		),
 		InstanceName
 	)
@@ -70,8 +73,8 @@ local function GenerateArrayType(Canonical, Specifier) -- Generate the match Spe
 		+ Namespace
 end
 
-return Aliasable.Namespace {
-	Boolean = Aliasable.Type.Definition(
+return Structure.Aliasable.Namespace {
+	Boolean = Structure.Aliasable.Type.Definition(
 		PEG.Select{
 			PEG.Sequence{PEG.Pattern"true", PEG.Constant(true)},
 			PEG.Sequence{PEG.Pattern"false", PEG.Constant(false)}
@@ -79,10 +82,10 @@ return Aliasable.Namespace {
 		Execution.NamedFunction("Boolean.PassThrough",PassThrough)
 	);
 
-	String = Aliasable.Type.Definition(
+	String = Structure.Aliasable.Type.Definition(
 		Variable.Child"Syntax",
 		Execution.NamedFunction("String.PassThrough",PassThrough),
-		Nested.Grammar{
+		Structure.Nested.Grammar{
 			Delimiter = PEG.Pattern'"';
 			Open = Variable.Sibling"Delimiter";
 			Close = Variable.Sibling"Delimiter";

@@ -1,11 +1,8 @@
-local Tools = require"Moonrise.Tools"
-local Import = require"Moonrise.Import"
-local Execution = require "Sisyphus2.Interpreter.Execution"
-local AliasList = Import.Module.Sister"AliasList"
-local Basic = Import.Module.Relative"Basic"
-local Nested = Import.Module.Relative"Nested"
-local Completable = Import.Module.Relative"PEG.Completable"
-local Namespace = Import.Module.Relative"Namespace"
+local AliasList = require"Sisyphus2.Structure.Aliasable.Type.AliasList"
+local Basic = require"Sisyphus2.Structure.Basic"
+local Nested = require"Sisyphus2.Structure.Nested"
+local Completable = require"Sisyphus2.Structure.Aliasable.PEG.Completable"
+local Namespace = require"Sisyphus2.Structure.Aliasable.Namespace"
 
 local OOP = require"Moonrise.OOP"
 
@@ -29,8 +26,9 @@ Definition.Initialize = function(_, self, Pattern, Function, Syntax, AliasableTy
 end;
 
 Definition.Decompose = function(self)
+	local Aliases = self.Aliases:Decompose()
 	local Grammar = Nested.Grammar()
-	Grammar.Rules.Entries:Add("Aliases", self.Aliases:Decompose())
+	Grammar.Rules.Entries:Add("Aliases", Aliases)
 	Grammar:Merge(self.Syntax)
 	local Namespace = Basic.Namespace()
 	Namespace.Children.Entries:Add("Aliasable", self.AliasableTypes:Decompose())

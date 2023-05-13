@@ -1,7 +1,9 @@
 local OOP = require"Moonrise.OOP"
 local Tools = require"Moonrise.Tools"
 
-Variable = OOP.Declarator.Shortcuts(
+local Box = require"Sisyphus2.Interpreter.Execution.Box"
+
+local Variable = OOP.Declarator.Shortcuts(
 	"Variable", {
 		require"Sisyphus2.Interpreter.Execution.Resolvable"
 	}
@@ -17,7 +19,8 @@ function Variable:Initialize(Instance, Location)
 end
 
 function Variable:__call(Environment)
-	return Environment.Variables[self.Location]
+	assert(Environment.Variables[self.Location] ~= nil)
+	return Box("Unknown", Environment.Variables[self.Location])
 end
 
 return Variable

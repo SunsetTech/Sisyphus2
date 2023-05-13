@@ -1,50 +1,40 @@
 unpack = unpack or table.unpack
 table.unpack = table.unpack or unpack
 require"Moonrise.Import.Install".All()
-local Tools = require"Moonrise.Tools"
-local posix = require"posix"
-local function getTime()
-    local s,ns = posix.clock_gettime(posix.CLOCK_MONOTONIC)
-    return s + ns * 1e-9
-end
 
---[[local DebugOutput = require"Toolbox.Debug.Registry".GetDefaultPipe()
-DebugOutput.IncludeSource = false
-DebugOutput.Enabled = false]]
+local Tools = require"Moonrise.Tools"
+Tools.Debug.OutputEnabled = true 
+Tools.Debug.IndentChar="| "
 
 local Vlpeg = require"Sisyphus2.Vlpeg"
-local Structure = require"Sisyphus2.Structure"
-
-local TemplateGrammar = require"Sisyphus2.Grammar"
-local AliasableGrammar = TemplateGrammar:Decompose()
-local Grammar = AliasableGrammar/"userdata"
 
 local InputPath = arg[1] or error"Supply filename"
 local OutputPath = arg[2] or error"Supply filename"
 
-local InputFile = io.open(InputPath, "r")
+local InputFile = io.open(InputPath, "r") assert(InputFile)
 local Input = InputFile:read"a"
 InputFile:close()
 
-print"_____"
-local StartTime = getTime()
 collectgarbage"stop"
---debug.sethook(nil,"clr")
+local TemplateGrammar = require"Sisyphus2.Grammar"
+local AliasableGrammar = TemplateGrammar:Decompose()
+local Grammar = AliasableGrammar/"userdata"
+
+print"_____"
+local StartTime = Tools.Profile.GetTime()
 local Output = Tools.Filesystem.ChangePath(
 	Tools.Path.Join(Tools.Path.DirName(InputPath)),
 	Vlpeg.Match,
 	Grammar, Input, 1, {
 		Grammar = AliasableGrammar;
-		Variables = {};
+
 	}
 )
 print"_____"
+
 print(Output)
 print(collectgarbage("count")/1024 .."MB")
-print((getTime()-StartTime)*1000 .."ms")
---[[for Name, Amount in pairs(Structure.Object.TotalCopies) do
-	--print(Amount .." ".. Name .." copies created")
-end]]
+print((Tools.Profile.GetTime()-StartTime)*1000 .."ms")
 
 local OutputFile = io.open(OutputPath, "w")
 assert(OutputFile)

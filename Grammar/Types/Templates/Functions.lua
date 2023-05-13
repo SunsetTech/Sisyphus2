@@ -1,4 +1,5 @@
 local Import = require"Toolbox.Import"
+local Box    = require "Sisyphus2.Interpreter.Execution.Box"
 
 local Structure = require"Sisyphus2.Structure"
 local CanonicalName = Structure.CanonicalName
@@ -81,8 +82,9 @@ return Template.Namespace{
 					Argument = Execution.ResolveArgument(Argument)
 					for K,V in pairs(Argument) do
 						Argument[K] = Execution.ResolveArgument(V)
+						if Argument[K] ~= V then error"?" end
 					end
-					return table.concat(Argument)
+					return Box("Data.String", table.concat(Argument))
 				end
 			)
 		)

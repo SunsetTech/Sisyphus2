@@ -1,0 +1,8 @@
+With Templates<
+	Template TASTestA<Data.String LHS, Data.String RHS> Data.String $Join<$LHS "+" $RHS>
+> Templates <
+	Template TASTestB<Data.String RHS> Templates.TASTestA<"Left" $RHS>
+	Template TASTestC<Templates.TASTestA Argument> Data.String $$Argument
+	Template TASTestD<Data.Boolean Switch, Data.String A, Data.String B> Data.String If $Switch $A $B
+	Template TASTestE<Templates.TASTestA Argument> Data.String Get<Templates.TASTestA LHS> $Argument
+>

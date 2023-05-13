@@ -15,19 +15,7 @@ local Namespace = OOP.Declarator.Shortcuts(
 )
 
 
-Namespace.Initialize = function(_, self, Children, Base, _Children)
-	self.Base = Base or Basic.Namespace()
-	if _Children then 
-		self.Children = _Children
-	else
-		self.Children = Map({"Aliasable.Namespace", "Aliasable.Type.Definition"}, Children)
-	end
-	self.Decompose = Namespace.Decompose
-	self.Copy = Namespace.Copy
-	self.Merge = Namespace.Merge
-end;
-
-Namespace.Decompose = function(self) -- into a Basic.Namespace
+local Decompose = function(self) -- into a Basic.Namespace
 	local Basics = Basic.Namespace()
 	for Index = 1, self.Children.Entries:NumKeys() do
 		local Name, Entry = self.Children.Entries:GetPair(Index)
@@ -41,16 +29,28 @@ Namespace.Decompose = function(self) -- into a Basic.Namespace
 		+ Basic.Namespace(self.Children())]]
 end;
 
-Namespace.Copy = function(self)
+local Copy = function(self)
 	local New = Namespace(nil, self.Base:Copy(), self.Children:Copy())
 	return New
 end;
 
-Namespace.Merge = function(Into, From)
+local Merge = function(Into, From)
 	Into.Base:Merge(From.Base)
 	Into.Children:Merge(From.Children)
 	--Into.Base = Into.Base + From.Base
 	--Into.Children = Into.Children + From.Children
+end;
+
+Namespace.Initialize = function(_, self, Children, Base, _Children)
+	self.Base = Base or Basic.Namespace()
+	if _Children then 
+		self.Children = _Children
+	else
+		self.Children = Map({"Aliasable.Namespace", "Aliasable.Type.Definition"}, Children)
+	end
+	self.Decompose = Decompose
+	self.Copy = Copy
+	self.Merge = Merge
 end;
 
 return Namespace

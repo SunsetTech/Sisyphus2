@@ -15,28 +15,10 @@ local Map = OOP.Declarator.Shortcuts(
 	}
 )
 
-Map.Initialize = function(_, self, Types, Entries, _Entries)
-	--print_caller_info()
-	self.Types =
-		type(Types) == "string"
-		and {Types}
-		or Types
-	--self.Entries = setmetatable(Entries, {__newindex=function(_,k,v) print(k,v) print_caller_info() rawset(Entries, k, v) end;})
-	self.Entries = _Entries or OrderedMap(Entries)
-	self.Add = Map.Add
-	self.Decompose = Map.Decompose
-	self.Copy = Map.Copy
-	self.Merge = Map.Merge
-end;
-
-Map.Add = function(self, Key, Value)
-	self.Entries:Add(Key, Value)
-end;
-
 local GetPair = OrderedMap.GetPair
 local NumKeys = OrderedMap.NumKeys
 
-Map.Decompose = function(self)
+local Decompose = function(self)
 	local Decomposed = {}
 
 	--for Key, Entry in pairs(self.Entries) do
@@ -58,7 +40,7 @@ Map.Decompose = function(self)
 	return Decomposed
 end;
 
-Map.Copy = function(self)
+local Copy = function(self)
 	local EntriesCopy = OrderedMap()
 	--for Name, Entry in pairs(self.Entries) do
 	for Index = 1, NumKeys(self.Entries) do
@@ -69,7 +51,7 @@ Map.Copy = function(self)
 	return New
 end;
 
-Map.Merge = function(self, From)
+local Merge = function(self, From)
 	for Index = 1, NumKeys(From.Entries) do
 		local Name, Entry =GetPair(From.Entries, Index)
 		if self.Entries.Present[Name] then
@@ -86,6 +68,24 @@ Map.Merge = function(self, From)
 			Into.Entries[Name] = From.Entries[Name]
 		end
 	end]]
+end;
+
+Map.Initialize = function(_, self, Types, Entries, _Entries)
+	--print_caller_info()
+	self.Types =
+		type(Types) == "string"
+		and {Types}
+		or Types
+	--self.Entries = setmetatable(Entries, {__newindex=function(_,k,v) print(k,v) print_caller_info() rawset(Entries, k, v) end;})
+	self.Entries = _Entries or OrderedMap(Entries)
+	self.Add = Map.Add
+	self.Decompose = Decompose
+	self.Copy = Copy
+	self.Merge = Merge
+end;
+
+Map.Add = function(self, Key, Value)
+	self.Entries:Add(Key, Value)
 end;
 
 return Map
