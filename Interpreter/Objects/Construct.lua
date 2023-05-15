@@ -58,7 +58,7 @@ Package = {
 		return New
 	end;
 
-	AliasableType = function(Name)
+	AliasableType = function(Name) --TODO fix this?
 		local New = PEG.Select{
 			Variable.Canonical(
 				CanonicalName(

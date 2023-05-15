@@ -13,7 +13,7 @@ return Basic.Namespace{
 	Template = Module.Child"Template";
 	Grammar = Module.Child"Grammar";
 	Root = Module.Child"Root";
-
+	String = require"Sisyphus2.Grammar.Types.Basic.String";
 	Modified = Basic.Type.Definition(
 		Dynamic.Jump(
 			Construct.Invocation( 

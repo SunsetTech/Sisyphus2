@@ -28,8 +28,6 @@ function Definition.Arguments(Parameters)
 	return New
 end
 
-
-
 --Parses the template grammar for the newly defined template
 function Definition.Finisher(Basetype, Name, Parameters, GeneratedTypes)
 	local New = function(Body)
@@ -94,9 +92,7 @@ function Definition.Generate(Name, Parameters, Basetype, Environment) --Creates 
 			CurrentGrammar.Syntax,
 			CurrentGrammar.Information
 		),
-		VariablesNamespace + Definition.Finisher(Basetype, Name, Parameters, GeneratedTypes)( --Recursion
-			Interpreter.Execution.RecursiveUnfixed()
-		)
+		VariablesNamespace 
 	)
 	DefinitionGrammar = DefinitionGrammar/"Aliasable.Grammar"
 	DefinitionGrammar.InitialPattern = PEG.Apply( --Edit the initial pattern to match Basetype

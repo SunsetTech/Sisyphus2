@@ -79,12 +79,12 @@ return Template.Namespace{
 			Execution.NamedFunction(
 				"Join", 
 				function(Argument)
-					Argument = Execution.ResolveArgument(Argument)
+					print(Argument)
 					for K,V in pairs(Argument) do
-						Argument[K] = Execution.ResolveArgument(V)
-						if Argument[K] ~= V then error"?" end
+						Argument[K] = V()
+						--if Argument[K] ~= V then error"?" end
 					end
-					return Box("Data.String", table.concat(Argument))
+					return Box("Join.Return", Box("Data.String", table.concat(Argument)))
 				end
 			)
 		)

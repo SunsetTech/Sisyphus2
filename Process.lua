@@ -33,6 +33,7 @@ local Output = Tools.Filesystem.ChangePath(
 print"_____"
 
 print(Output)
+Output = Output()
 print(collectgarbage("count")/1024 .."MB")
 print((Tools.Profile.GetTime()-StartTime)*1000 .."ms")
 

@@ -48,6 +48,10 @@ local function PassThrough(...)
 	return ...
 end
 
+local function StringBoxer(Value)
+	return Box("Data.String", Value)
+end
+
 local function GenerateArrayType(Canonical, Specifier) -- Generate the match Specifier and the Added Types
 	local GeneratedTypes = Structure.Aliasable.Namespace()
 
@@ -63,7 +67,7 @@ local function GenerateArrayType(Canonical, Specifier) -- Generate the match Spe
 			Construct.ArgumentArray(
 				Construct.AliasableType(Specifier.Target:Decompose(true))
 			),
-			Execution.NamedFunction("Array.ArrayBoxer",Box)
+			Execution.NamedFunction("ArrayBoxer",ArrayBoxer)
 		),
 		InstanceName
 	)
@@ -83,22 +87,8 @@ return Structure.Aliasable.Namespace {
 	);
 
 	String = Structure.Aliasable.Type.Definition(
-		Variable.Child"Syntax",
-		Execution.NamedFunction("String.PassThrough",PassThrough),
-		Structure.Nested.Grammar{
-			Delimiter = PEG.Pattern'"';
-			Open = Variable.Sibling"Delimiter";
-			Close = Variable.Sibling"Delimiter";
-			Contents = PEG.Capture(
-				PEG.All(
-					require"Sisyphus2.Structure.Nested.PEG.Dematch"(
-						PEG.Pattern(1),
-						Variable.Sibling"Delimiter"
-					)
-				)
-			);
-			PEG.Sequence{Variable.Child"Open", Variable.Child"Contents", Variable.Child"Close"};
-		}
+		Construct.BasicNamespace"String",
+		Execution.NamedFunction("String.PassThrough",StringBoxer)
 	);
 
 	Array = Incomplete(

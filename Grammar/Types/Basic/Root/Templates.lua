@@ -1,3 +1,5 @@
+local OOP = require"Moonrise.OOP"
+
 local Structure = require"Sisyphus2.Structure"
 local Aliasable = Structure.Aliasable
 local Basic = Structure.Basic
@@ -9,13 +11,14 @@ local Syntax = require"Sisyphus2.Interpreter.Objects.Syntax"
 local Static = require"Sisyphus2.Interpreter.Parse.Static"
 local Execution = require"Sisyphus2.Interpreter.Execution"
 local Dynamic = require"Sisyphus2.Interpreter.Parse.Dynamic"
+local Box = require"Sisyphus2.Interpreter.Execution.Box"
 
 local function Branch(Switch, Left, Right)
 	print(Switch, Left, Right)
-	if Execution.ResolveArgument(Switch) then
-		return Execution.ResolveArgument(Left)
+	if (Switch) then
+		return (Left)
 	else
-		return Execution.ResolveArgument(Right)
+		return (Right)
 	end
 	--[[return 
 		Execution.Switch
@@ -53,6 +56,12 @@ return Basic.Type.Set{
 									local Result = From.Fields[Field]
 									print("Got", Result)
 									print("TODO: type check the result")
+									if (OOP.Reflection.Type.Of(Box, Result)) then
+										print(Basetype, Result.Type)
+										assert(Basetype == Result.Type)
+									else
+										print("TODO", Result, "wasn't a box but should be")
+									end
 									return Result
 								end
 							)

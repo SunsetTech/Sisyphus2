@@ -8,7 +8,7 @@ function Box:Initialize(Instance, Type, Value)
 end
 
 function Box:__tostring()
-	return "Box<".. tostring(self.Value) ..">"
+	return tostring(self.Type) .."(".. tostring(self.Value) ..")"
 end
 
 function Box:__call()
