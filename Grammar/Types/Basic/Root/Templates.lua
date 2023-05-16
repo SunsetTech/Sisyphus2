@@ -14,18 +14,13 @@ local Dynamic = require"Sisyphus2.Interpreter.Parse.Dynamic"
 local Box = require"Sisyphus2.Interpreter.Execution.Box"
 
 local function Branch(Switch, Left, Right)
-	print(Switch, Left, Right)
-	if (Switch) then
-		return (Left)
+	if Switch then
+		return Left
 	else
-		return (Right)
+		return Right
 	end
-	--[[return 
-		Execution.Switch
-		and Left
-		or Right]]
 end
-print("Branch = ".. tostring(Branch))
+
 return Basic.Type.Set{
 	Get = Basic.Type.Definition(
 		Syntax.Tokens{
@@ -41,8 +36,7 @@ return Basic.Type.Set{
 						Static.GetEnvironment
 					},
 					function(Basetype, ExpressionType, Field, Environment)
-						print(Basetype, ExpressionType:Decompose(true), Field, Environment)
-						local GrammarCopy = Environment.Grammar:Copy()
+						local GrammarCopy = Environment.Grammar
 
 						GrammarCopy.InitialPattern = Aliasable.Type.Definition(
 							Construct.Centered(
@@ -51,17 +45,15 @@ return Basic.Type.Set{
 								}
 							),
 							Execution.NamedFunction(
-								"Get",function(From)
-									print("Getting from", From)
+								"<-",function(From)
 									local Result = From.Fields[Field]
-									print("Got", Result)
-									print("TODO: type check the result")
+									
 									if (OOP.Reflection.Type.Of(Box, Result)) then
-										print(Basetype, Result.Type)
 										assert(Basetype == Result.Type)
 									else
 										print("TODO", Result, "wasn't a box but should be")
 									end
+									
 									return Result
 								end
 							)
